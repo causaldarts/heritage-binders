@@ -89,11 +89,20 @@ body.viewer .w-add,body.viewer .s-add,body.viewer [data-act="add"],body.viewer [
 .rings i{display:block;width:26px;height:9px;margin-left:-13px;border-radius:5px;background:linear-gradient(#f4f5f7,#8d939c 55%,#5d636b);box-shadow:0 2px 3px rgba(0,0,0,.6)}
 .stacked .rings i{margin-left:-9px}
 /* phones and narrow windows: one page of card fronts at a time */
-.binder.single{--bw:min(100cqw - 30px,520px,max(300px,(100svh - 150px) * .75));width:var(--bw);height:calc(var(--bw) * 4 / 3);margin:0 auto}
+.binder.single{--bw:min(100cqw - 28px,(100cqh - 28px) * .75,560px);width:var(--bw);height:calc(var(--bw) * 4 / 3);margin:auto}
+/* single view never scrolls: the page is sized to whatever space the screen leaves */
+html:has(body.single),body.single{height:100dvh;overflow:hidden;overscroll-behavior:none}
 .single .rings{left:0}
 .single .rings i{margin-left:-9px}
 .single .page{inset:0;width:100%;border-radius:0 6px 6px 0}
-body.single .stage{overflow-y:auto;place-items:start center;padding:14px 0 18px}
+body.single .stage{overflow:hidden;place-items:center;padding:0}
+/* phones: slimmer header and one swipeable row of jump buttons, so the page gets the room */
+body.single .brand-p{display:none}
+body.single .top{gap:6px 16px;padding-top:8px;padding-bottom:4px}
+body.single .nav{gap:6px 10px;padding-top:4px;padding-bottom:max(10px,env(safe-area-inset-bottom))}
+body.single .jumps{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;max-width:100%;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+body.single .jumps::-webkit-scrollbar{display:none}
+body.single .jumps .btn{flex:none;padding:4px 9px;font-size:.8rem}
 .spread.slideN{animation:slideN .22s ease-out}
 .spread.slideP{animation:slideP .22s ease-out}
 @keyframes slideN{from{transform:translateX(28px);opacity:.25}}
@@ -276,7 +285,17 @@ dialog::backdrop{background:rgba(5,9,7,.72)}
   .prog{min-width:150px}.prog-line b{font-size:1.05rem}
   .stage{container-type:inline-size;display:block;margin:4px 8px 6px}
   .binder{--bw:calc(100cqw - 26px);width:var(--bw);height:calc(var(--bw) / 1.5);margin:13px auto}
-  .binder.single{--bw:min(100cqw - 30px,560px);height:calc(var(--bw) * 4 / 3);margin:13px auto}
+  html:has(body.single),body.single{height:100dvh;min-height:0}
+  body.single{display:flex;overflow:hidden}
+  body.single .stage{container-type:size;display:grid;flex:1;min-height:0;margin:2px 8px}
+  .binder.single{--bw:min(100cqw - 28px,(100cqh - 28px) * .75);height:calc(var(--bw) * 4 / 3);margin:auto}
+  body.single .nav{position:static}
+  body.single .sync{display:none}
+  body.single .top{flex-wrap:nowrap}
+  body.single .prog{flex:1;min-width:90px}
+  body.single #needN{display:none}
+  body.single .top-actions{gap:8px}
+  body.single .top-actions .btn{padding:5px 10px;font-size:.8rem}
   .nav{position:sticky;bottom:0;z-index:20;flex-wrap:nowrap;padding:5px 14px;padding-bottom:max(5px,env(safe-area-inset-bottom));background:rgba(23,35,29,.95);border-top:1px solid rgba(255,255,255,.1)}
   .nav .turn{height:32px}
   .jumps{flex-wrap:nowrap}.jumps .btn{padding:4px 8px;font-size:.78rem}
