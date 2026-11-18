@@ -1,0 +1,12 @@
+[build]
+  publish = "site"
+  functions = "netlify/functions"
+  command = "echo 'Nothing to build: the site is ready as it is.'"
+
+[functions]
+  node_bundler = "esbuild"
+
+[[headers]]
+  for = "/cards*/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
