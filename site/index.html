@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#17231d">
+<title>Topps Heritage Binders</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=Zilla+Slab:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout idea: a binder lying open on a felt desk. Header = set progress, centre = the open spread, footer = page controls. One dark world, by choice. */
+  --desk:#27382f;
+  --desk-deep:#17231d;
+  --cover:#1b2740;
+  --sheet:#111317;
+  --pocket:#1b1e24;
+  --stock:#f3efe4;
+  --ink:#ece7da;
+  --muted:#a3ab9f;
+  --gold:#e2b33c;
+  --bad:#e0705f;
+  --display:"Zilla Slab",Rockwell,Georgia,serif;
+  --body:"Barlow","Helvetica Neue",Arial,sans-serif;
+  --cond:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:radial-gradient(120% 90% at 50% 35%,var(--desk) 0%,var(--desk-deep) 100%) var(--desk-deep);color:var(--ink);font-family:var(--body);display:flex;flex-direction:column;overflow:hidden}
+/* phone: the two pages of a spread stack, backs on top and fronts below, and the stage scrolls */
+body.stacked .stage{overflow-y:auto;place-items:start center;padding:14px 0 18px}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+/* ---------- header ---------- */
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:10px 28px;padding:12px 20px 8px}
+.brand{display:flex;align-items:center;gap:14px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.18);border-radius:9px;padding:7px 10px 7px 13px;cursor:pointer;text-align:left}
+.brand:hover{background:rgba(0,0,0,.32);border-color:rgba(255,255,255,.3)}
+.brand-txt{display:flex;flex-direction:column}
+.brand-h{font:700 1.3rem/1.1 var(--display)}
+.brand-p{margin-top:2px;font:500 .8rem var(--cond);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.brand-sw{font:600 .78rem var(--cond);letter-spacing:.07em;text-transform:uppercase;color:#221a04;background:var(--gold);border-radius:5px;padding:4px 8px;white-space:nowrap}
+#shelf{width:min(720px,calc(100% - 32px))}
+#shelf h2{margin:0 0 4px;font:700 1.4rem/1.1 var(--display)}
+.shelf-sub{margin:0 0 14px;color:var(--muted);font-size:.92rem}
+.shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px;max-height:min(58vh,460px);overflow-y:auto;padding:2px}
+.spine{display:flex;flex-direction:column;gap:2px;align-items:flex-start;border:1px solid #333a36;border-left:6px solid #3a413d;background:#101216;border-radius:6px;padding:9px 10px;cursor:pointer;text-align:left;color:var(--muted)}
+.spine b{font:700 1.25rem/1 var(--display);color:#8b938a;font-variant-numeric:tabular-nums}
+.spine span{font:500 .78rem/1.2 var(--cond);letter-spacing:.05em;text-transform:uppercase}
+.spine.ready{border-left-color:var(--gold);background:#1b2740;color:var(--ink)}
+.spine.ready b{color:var(--ink)}
+.spine.ready:hover{filter:brightness(1.2)}
+.spine.open{outline:2px solid var(--gold);outline-offset:1px}
+.backup{margin-top:10px;padding-top:12px;border-top:1px solid #333a36}
+.backup p{margin:0;color:var(--muted);font-size:.88rem;max-width:60ch}
+.backup summary{cursor:pointer;font:600 .85rem var(--cond);letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.owner-form{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.owner-form input{flex:1;min-width:150px;background:#090a0c;border:1px solid #333a36;border-radius:6px;color:var(--ink);font:400 14px var(--body);padding:7px 9px}
+#ownerOut{margin-top:10px}
+/* visitors to a shared binder look but cannot change it */
+body.viewer .w-add,body.viewer .s-add,body.viewer [data-act="add"],body.viewer [data-act="remove"],body.viewer [data-act="turn"]{display:none}
+.backup .d-btns{margin-top:10px}
+.shelf-msg{min-height:1.3em;margin:12px 0 0;font-size:.92rem;color:var(--ink)}
+.prog{flex:1;min-width:210px;max-width:440px}
+.prog-line{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font:500 .9rem var(--cond);letter-spacing:.04em;color:var(--muted);font-variant-numeric:tabular-nums}
+.prog-line b{font:700 1.25rem var(--display);color:var(--ink)}
+.bar{height:7px;border-radius:4px;background:rgba(0,0,0,.35);overflow:hidden;margin-top:4px}
+.bar i{display:block;height:100%;background:var(--gold);border-radius:4px;transition:width .4s}
+.top-actions{display:flex;align-items:center;gap:12px;margin-left:auto}
+.btn{border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.06);border-radius:7px;padding:7px 13px;font:600 .95rem var(--cond);letter-spacing:.05em;text-transform:uppercase;cursor:pointer}
+.btn:hover{background:rgba(255,255,255,.13)}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:#221a04}
+.btn.gold:hover{filter:brightness(1.08)}
+.btn.danger{border-color:rgba(224,112,95,.6);color:#f3b1a6}
+.btn[disabled]{opacity:.5;cursor:default}
+.top-actions .btn{white-space:nowrap}
+@media (max-width:480px){body:not(.viewer) .top-actions .sync:empty,.top-actions .sync{display:none}.top-actions{flex-wrap:nowrap}}
+.sync{font:500 .8rem var(--cond);letter-spacing:.05em;color:var(--muted);white-space:nowrap}
+.sync.err{color:var(--bad)}
+
+/* ---------- stage / binder ---------- */
+.stage{flex:1;min-height:0;container-type:size;display:grid;place-items:center;margin:4px 16px}
+.binder{--ratio:1.5;--ph:min(100cqh - 30px,(100cqw - 30px) / var(--ratio));height:var(--ph);width:calc(var(--ph) * var(--ratio));position:relative;border-radius:9px;background:var(--cover);box-shadow:0 0 0 12px var(--cover),0 0 0 13px rgba(255,255,255,.1),0 26px 50px rgba(0,0,0,.55)}
+.binder.stacked{--bw:min(100cqw - 30px,500px);width:var(--bw);height:calc(var(--bw) * 8 / 3)}
+.spread{position:absolute;inset:0;perspective:2400px}
+.rings{position:absolute;top:0;bottom:0;left:50%;width:0;z-index:9;display:flex;flex-direction:column;justify-content:space-around;pointer-events:none}
+.stacked .rings{left:0}
+.rings i{display:block;width:26px;height:9px;margin-left:-13px;border-radius:5px;background:linear-gradient(#f4f5f7,#8d939c 55%,#5d636b);box-shadow:0 2px 3px rgba(0,0,0,.6)}
+.stacked .rings i{margin-left:-9px}
+
+.page{position:absolute;top:0;bottom:0;width:50%;background:var(--sheet);container-type:inline-size;display:flex;flex-direction:column;padding:4% 4% 1.5%;overflow:hidden}
+.page.left{left:0;padding-right:9%;border-radius:6px 0 0 6px;box-shadow:inset -18px 0 22px -16px rgba(0,0,0,.9)}
+.page.right{right:0;padding-left:9%;border-radius:0 6px 6px 0;box-shadow:inset 18px 0 22px -16px rgba(0,0,0,.9)}
+.stacked .page{width:100%;left:0;right:0;border-radius:0 6px 6px 0}
+.stacked .page.upper{top:0;bottom:50%;border-bottom:1px solid #000}
+.stacked .page.lower{top:50%;bottom:0}
+.stacked .spread{animation:none}
+.spread.swap{animation:swap .28s ease-out}
+@keyframes swap{from{opacity:.25}}
+.page.blank{background:#0c0e11}
+.holes{position:absolute;top:0;bottom:0;width:5%;display:flex;flex-direction:column;justify-content:space-around;align-items:center;pointer-events:none}
+.left .holes{right:1.6%}.right .holes{left:1.6%}
+.holes i{display:block;width:58%;aspect-ratio:1;border-radius:50%;background:var(--desk-deep);box-shadow:inset 0 1px 2px #000}
+.pg-foot{flex:none;display:flex;justify-content:space-between;align-items:center;height:5cqi;font:500 2.7cqi var(--cond);letter-spacing:.1em;text-transform:uppercase;color:#6f766c;font-variant-numeric:tabular-nums}
+
+.grid9{flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:2.2cqi;align-items:center;justify-items:center}
+.pocket{container-type:inline-size;width:100%;aspect-ratio:5/7;position:relative;border-radius:4%;background:var(--pocket);box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
+.pocket::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(115deg,rgba(255,255,255,.17),rgba(255,255,255,0) 26%,rgba(255,255,255,0) 72%,rgba(255,255,255,.07))}
+
+/* card (drawn in team colours, or the collector's own photo) */
+.card{position:absolute;inset:3cqi;border:0;margin:0;padding:4cqi;border-radius:2.6cqi;background:var(--frame,var(--stock));color:#1c1b19;display:flex;flex-direction:column;cursor:pointer;overflow:hidden;box-shadow:0 1cqi 3cqi rgba(0,0,0,.55);text-align:center;transition:transform .15s}
+.card:hover{transform:translateY(-1.2cqi)}
+.c-art{flex:1;min-height:0;position:relative;display:grid;place-items:center;border-radius:1.4cqi;overflow:hidden;background:linear-gradient(160deg,var(--t1),color-mix(in srgb,var(--t1) 58%,#000))}
+.c-art::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,.09) 0 1px,transparent 1px 7cqi)}
+.c-mono{position:relative;font:700 30cqi/1 var(--display);color:var(--t2);letter-spacing:-.02em}
+.c-no{position:absolute;top:2.2cqi;left:2.2cqi;z-index:1;font:700 7.5cqi/1 var(--cond);background:var(--t2);color:var(--t1);padding:1.2cqi 2.8cqi;border-radius:10cqi;font-variant-numeric:tabular-nums}
+.c-team{position:absolute;left:2cqi;right:2cqi;bottom:2.4cqi;font:600 5.2cqi/1.05 var(--cond);letter-spacing:.09em;text-transform:uppercase;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.c-plate{flex:none;display:flex;flex-direction:column;gap:.6cqi;padding:2.6cqi .5cqi 0;background:var(--stock);margin:0 -4cqi -4cqi;padding-bottom:3.4cqi}
+.c-name{font:700 8.2cqi/1.05 var(--display);text-wrap:balance}
+.c-name.long{font-size:5.6cqi}
+.c-tags{font:600 5cqi/1 var(--cond);letter-spacing:.08em;text-transform:uppercase;color:#6d675b}
+.card.has-photo{padding:0;background:#000}
+.card.has-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.card.has-photo .c-no{background:rgba(0,0,0,.72);color:#fff;top:auto;left:auto;right:2cqi;bottom:2cqi;font-size:5.5cqi}
+.c-img{position:absolute;inset:0;background-repeat:no-repeat}
+/* horizontal cards sit sideways in a pocket, the way they do in a real binder */
+.card.land{inset:auto;left:50%;top:50%;width:134cqi;height:94cqi;translate:-50% -50%;rotate:-90deg}
+.card.land:hover{transform:translateX(1.2cqi)}
+.card.land .c-name.long{font-size:7cqi}
+
+/* card back: the real photo when the set has one, otherwise a plain stand-in drawn on grey card stock */
+.card.back{background:#cfc8b4;padding:5cqi 6cqi;gap:3cqi;text-align:left;color:#2a2823}
+.b-head{display:flex;align-items:center;gap:4cqi;border-bottom:.8cqi solid var(--t1);padding-bottom:3cqi}
+.b-no{flex:none;display:grid;place-items:center;min-width:19cqi;height:19cqi;padding:0 3cqi;border-radius:10cqi;background:var(--t1);color:#fff;font:700 9cqi/1 var(--cond);font-variant-numeric:tabular-nums}
+.b-who{display:flex;flex-direction:column;min-width:0}
+.b-name{font:700 8.6cqi/1.05 var(--display)}
+.b-name.long{font-size:5.6cqi}
+.b-team{font:600 5cqi/1.2 var(--cond);letter-spacing:.08em;text-transform:uppercase;color:#5d574a}
+.b-lines{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:space-evenly}
+.b-lines i{display:block;height:2.4cqi;border-radius:2cqi;background:rgba(40,36,28,.16)}
+.b-lines i:nth-child(2){width:92%}.b-lines i:nth-child(3){width:97%}.b-lines i:nth-child(4){width:84%}.b-lines i:nth-child(5){width:60%}
+.b-foot{font:600 4.6cqi/1 var(--cond);letter-spacing:.1em;text-transform:uppercase;color:#6d675b}
+.gap{width:100%;aspect-ratio:5/7}
+.cover{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:3cqi;padding:0 4cqi}
+.cover h2{margin:0;font:700 9cqi/1.05 var(--display);text-wrap:balance}
+.cover p{margin:0;font:400 max(12px,3.4cqi)/1.4 var(--body);color:var(--muted);max-width:34em}
+.cover .big{font:700 7cqi/1.1 var(--display);color:var(--gold)}
+.cover dl{margin:2cqi 0 0;display:grid;grid-template-columns:auto 1fr;gap:1.4cqi 3cqi;font:400 max(11.5px,3.1cqi)/1.3 var(--body);color:var(--ink)}
+.cover dt{font:600 max(11px,2.9cqi)/1.5 var(--cond);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.cover dd{margin:0}
+
+/* empty pocket */
+.slot{position:absolute;inset:0;border:0;background:none;border-radius:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2cqi;padding:6cqi;color:#99a096;text-align:center}
+.s-no{font:700 22cqi/1 var(--display);color:#566059;font-variant-numeric:tabular-nums}
+.s-name{font:500 6cqi/1.1 var(--cond);letter-spacing:.04em}
+.s-add{font:600 5.4cqi var(--cond);letter-spacing:.1em;text-transform:uppercase;color:var(--gold);opacity:0;transition:opacity .15s}
+.slot:hover .s-add,.slot:focus-visible .s-add{opacity:1}
+@media (hover:none){.s-add{opacity:.75}}
+
+/* page turn */
+.leaf{position:absolute;top:0;bottom:0;width:50%;z-index:6;transform-style:preserve-3d}
+.leaf .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.leaf .face.b{transform:rotateY(180deg)}
+.leaf .page{inset:0;width:100%}
+.leaf.fwd{right:0;transform-origin:left center;animation:turnF .62s cubic-bezier(.4,.1,.3,1) forwards}
+.leaf.back{left:0;transform-origin:right center;animation:turnB .62s cubic-bezier(.4,.1,.3,1) forwards}
+@keyframes turnF{to{transform:rotateY(-180deg)}}
+@keyframes turnB{to{transform:rotateY(180deg)}}
+
+/* ---------- back pages ---------- */
+.bp-head{flex:none;margin-bottom:2.5cqi}
+.bp-head h2{margin:0;font:700 5.6cqi/1.1 var(--display)}
+.bp-head p{margin:.8cqi 0 0;font:400 max(11px,2.9cqi)/1.3 var(--body);color:var(--muted)}
+.want-tools{flex:none;display:flex;gap:6px;flex-wrap:wrap;margin-bottom:2cqi}
+.want-tools input{flex:1;min-width:110px;background:#090a0c;border:1px solid #333a36;border-radius:6px;color:var(--ink);font:400 14px var(--body);padding:6px 9px}
+.chip{border:1px solid #3a413d;background:none;border-radius:20px;padding:4px 11px;font:600 13px var(--cond);letter-spacing:.06em;text-transform:uppercase;cursor:pointer;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#15171a}
+.want-list{flex:1;min-height:0;overflow-y:auto;list-style:none;margin:0;padding:0 4px 0 0;display:flex;flex-direction:column;gap:4px}
+.want-list li{display:flex;align-items:center;gap:9px;padding:5px 6px 5px 9px;background:var(--pocket);border-radius:6px;border-left:3px solid var(--tc,#555)}
+.w-no{flex:none;width:2.1em;font:700 16px var(--display);font-variant-numeric:tabular-nums;color:var(--ink)}
+.w-txt{flex:1;min-width:0;display:flex;flex-direction:column}
+.w-name{font:600 14px/1.2 var(--body)}
+.w-team{font:500 12.5px/1.2 var(--cond);letter-spacing:.04em;color:var(--muted)}
+.tag{display:inline-block;font:700 10.5px var(--cond);letter-spacing:.08em;border:1px solid currentColor;border-radius:3px;padding:0 4px;margin-left:5px;color:var(--gold);vertical-align:1px}
+.w-add{flex:none;border:0;border-radius:5px;background:var(--gold);color:#221a04;font:700 13px var(--cond);letter-spacing:.07em;text-transform:uppercase;padding:6px 10px;cursor:pointer}
+.w-add:hover{filter:brightness(1.1)}
+.empty{color:var(--muted);font:400 14px var(--body);padding:14px 4px}
+
+.numgrid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(16,1fr);gap:.7cqi;overflow-y:auto}
+.num{border:1px solid #39403c;background:none;border-radius:.9cqi;padding:0;font:600 max(8px,2.5cqi)/1 var(--cond);color:#8b938a;cursor:pointer;font-variant-numeric:tabular-nums;min-width:0}
+.num:hover{border-color:var(--gold);color:var(--gold)}
+.num.have{background:var(--gold);border-color:var(--gold);color:#221a04}
+.num.sp{border-style:dashed}
+.num.have.sp{box-shadow:inset 0 0 0 1px #221a04;border-style:solid}
+.key{flex:none;display:flex;gap:14px;flex-wrap:wrap;font:500 max(10.5px,2.6cqi) var(--cond);letter-spacing:.05em;color:var(--muted);margin-bottom:1.6cqi}
+.key span{display:inline-flex;align-items:center;gap:5px}
+.key i{display:inline-block;width:1em;height:1em;border-radius:2px;border:1px solid #39403c}
+.key i.h{background:var(--gold);border-color:var(--gold)}.key i.s{border-style:dashed;border-color:#8b938a}
+
+.teams{flex:1;min-height:0;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;gap:1.1cqi 4cqi;align-content:start}
+.team{display:grid;grid-template-columns:1fr auto;gap:0 6px;font:500 max(10.5px,2.9cqi)/1.15 var(--cond);letter-spacing:.02em}
+.team span:last-of-type{font-variant-numeric:tabular-nums;color:var(--muted)}
+.team .tb{grid-column:1/-1;height:max(3px,.9cqi);background:#000;border-radius:2px;overflow:hidden;margin-top:2px}
+.team .tb i{display:block;height:100%;background:var(--tc)}
+.team.done span:last-of-type{color:var(--gold)}
+
+/* ---------- footer ---------- */
+.nav{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px 14px;padding:8px 20px 14px}
+.nav .turn{width:44px;height:38px;padding:0;font-size:1.3rem;line-height:1}
+.scrub{display:flex;align-items:center;gap:10px;flex:1;min-width:200px;max-width:460px}
+.scrub input{flex:1;accent-color:var(--gold);min-width:0}
+.where{font:600 .95rem var(--cond);letter-spacing:.05em;white-space:nowrap;min-width:8.5em;font-variant-numeric:tabular-nums}
+.jumps{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.jumps .btn{padding:5px 10px;font-size:.85rem}
+
+/* ---------- card dialog ---------- */
+dialog{border:1px solid rgba(255,255,255,.14);border-radius:12px;background:#15181c;color:var(--ink);padding:22px;width:min(560px,calc(100% - 32px));box-shadow:0 30px 80px rgba(0,0,0,.7)}
+dialog::backdrop{background:rgba(5,9,7,.72)}
+.d-wrap{display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start}
+.d-card{flex:none;width:200px;margin:0 auto}
+.d-card .pocket{background:none;box-shadow:none}.d-card .pocket::after{display:none}
+.d-card .card{inset:0;cursor:default}.d-card .card:hover{transform:none}
+.d-card .slot{border:2px dashed #3a413d;cursor:default}
+.d-card.land{width:280px;height:200px;position:relative}
+.d-card.land .pocket{position:absolute;width:200px;left:40px;top:-40px;rotate:90deg}
+.d-card .card.land{inset:auto;left:50%;top:50%;width:140cqi;height:100cqi}
+.d-info{flex:1;min-width:210px}
+.d-info h2{margin:0 0 4px;font:700 1.5rem/1.1 var(--display);text-wrap:balance}
+.d-info p{margin:0 0 4px;color:var(--muted);font-size:.95rem}
+.d-btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.d-note{font-size:.85rem;margin-top:12px !important}
+.d-close{position:absolute;top:8px;right:10px;border:0;background:none;font-size:1.5rem;line-height:1;cursor:pointer;color:var(--muted);padding:4px 8px}
+
+/* ---------- toast ---------- */
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);z-index:50;background:#f3efe4;color:#1c1b19;border-radius:9px;padding:9px 10px 9px 15px;display:flex;align-items:center;gap:10px;font:500 .95rem var(--body);box-shadow:0 10px 30px rgba(0,0,0,.5);max-width:calc(100% - 32px)}
+.toast[hidden]{display:none}
+.toast button{border:0;background:#1c1b19;color:#f3efe4;border-radius:6px;padding:6px 10px;font:600 .85rem var(--cond);letter-spacing:.06em;text-transform:uppercase;cursor:pointer;white-space:nowrap}
+.toast button.ghost{background:none;color:#1c1b19;text-decoration:underline}
+
+@media (max-width:760px){
+  .top{padding:10px 16px 6px}
+  .top-actions{margin-left:0;width:100%;justify-content:space-between}
+  .stage{margin:4px 12px 4px 16px}
+  .nav{padding:6px 16px 12px}
+}
+@media (orientation:landscape) and (max-height:560px){
+  html,body{height:auto;min-height:100%}
+  body{display:block;overflow:visible}
+  .top{padding:6px 14px 2px;gap:4px 14px}
+  .brand{padding:4px 8px 4px 10px}.brand-h{font-size:1.05rem}.brand-p{display:none}
+  .prog{min-width:150px}.prog-line b{font-size:1.05rem}
+  .stage{container-type:inline-size;display:block;margin:4px 8px 6px}
+  .binder{--bw:calc(100cqw - 26px);width:var(--bw);height:calc(var(--bw) / 1.5);margin:13px auto}
+  .nav{position:sticky;bottom:0;z-index:20;flex-wrap:nowrap;padding:5px 14px;padding-bottom:max(5px,env(safe-area-inset-bottom));background:rgba(23,35,29,.95);border-top:1px solid rgba(255,255,255,.1)}
+  .nav .turn{height:32px}
+  .jumps{flex-wrap:nowrap}.jumps .btn{padding:4px 8px;font-size:.78rem}
+  .toast{bottom:56px}
+}
+@media (prefers-reduced-motion:reduce){.leaf{animation-duration:.01s !important}.card{transition:none}.bar i{transition:none}}
+</style>
+</head>
+<body>
+<header class="top">
+  <button class="brand" id="binderBtn" type="button" aria-haspopup="dialog" title="Switch binder">
+    <span class="brand-txt"><span class="brand-h" id="setTitle">Topps Heritage</span><span class="brand-p" id="setSub">Loading binder…</span></span>
+    <span class="brand-sw">Switch binder</span>
+  </button>
+  <div class="prog" aria-live="polite">
+    <div class="prog-line"><span><b id="haveN">0</b> of <span id="totN">0</span> in the binder</span><span id="needN"></span></div>
+    <div class="bar"><i id="barFill" style="width:0"></i></div>
+  </div>
+  <div class="top-actions">
+    <span class="sync" id="sync"></span>
+    <button class="btn" id="signBtn" type="button" hidden>Sign in</button>
+    <button class="btn" id="bulkBtn" type="button" hidden>Add photos</button>
+    <button class="btn gold" id="toAdd" type="button">Add cards</button>
+  </div>
+</header>
+
+<main class="stage" id="stage">
+  <div class="binder" id="binder">
+    <div class="spread" id="spread"></div>
+    <div class="rings" aria-hidden="true"><i></i><i></i><i></i></div>
+  </div>
+</main>
+
+<footer class="nav">
+  <button class="btn turn" id="prev" type="button" aria-label="Previous page">‹</button>
+  <div class="scrub">
+    <input type="range" id="scrub" min="0" max="23" step="1" value="0" aria-label="Flip to page">
+    <span class="where" id="where"></span>
+  </div>
+  <button class="btn turn" id="next" type="button" aria-label="Next page">›</button>
+  <div class="jumps" id="jumps"></div>
+</footer>
+
+<dialog id="dlg" aria-labelledby="dTitle">
+  <button class="d-close" id="dClose" type="button" aria-label="Close">×</button>
+  <div class="d-wrap">
+    <div class="d-card" id="dCard"></div>
+    <div class="d-info" id="dInfo"></div>
+  </div>
+  <input type="file" id="photoFile" accept="image/*" hidden>
+  <input type="file" id="bulkFile" accept="image/*" multiple hidden>
+</dialog>
+
+<dialog id="shelf" aria-labelledby="shelfTitle">
+  <button class="d-close" id="shelfClose" type="button" aria-label="Close">×</button>
+  <h2 id="shelfTitle">Your Heritage binders</h2>
+  <p class="shelf-sub">One binder per set, 2001 to 2026. Each keeps its own cards and photos.</p>
+  <div class="shelf" id="shelfGrid"></div>
+  <p class="shelf-msg" id="shelfMsg" role="status"></p>
+  <details class="backup" id="ownerBox" hidden>
+    <summary>Owner sign-in</summary>
+    <p id="ownerMsg">Everyone sees this binder. Only its owner can add or remove cards.</p>
+    <form class="owner-form" id="ownerForm">
+      <input type="text" id="ownerEmail" value="owner" autocomplete="username" hidden aria-hidden="true">
+      <input type="password" id="ownerPass" placeholder="Password" autocomplete="current-password" aria-label="Owner password" required>
+      <button class="btn gold" type="submit">Sign in</button>
+    </form>
+    <button class="btn" id="ownerOut" type="button" hidden>Sign out</button>
+  </details>
+  <div class="backup" id="backupBox" hidden>
+    <p>On this website your cards are saved in this browser only. A backup file moves them to another phone or computer.</p>
+    <div class="d-btns"><button class="btn" id="backupSave" type="button">Save a backup file</button><button class="btn" id="backupLoad" type="button">Load a backup file</button></div>
+    <input type="file" id="backupFile" accept="application/json,.json" hidden>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="site-config.js"></script>
+<script>
+/* ===== binders: one per Topps Heritage set. Each set that is set up lives in its own file under sets/ ===== */
+const YEARS=Array.from({length:26},(_,i)=>2026-i);
+const READY={"2026": "sets/2026.js", "2025": "sets/2025.js"};           // year -> data file
+window.HERITAGE_SETS=window.HERITAGE_SETS||{};
+let SET=null, TEAMS=[], cards=[], byN=new Map(), idxOf=new Map(), BASELINE=[], SHOT=new Map(), LANDSET=new Set();
+let BACKUP=new Set(), SHEETS=0, PAGES=[], TEAM_PAGE=0, WANT_PAGE=0, GRID_PAGE=0, TOTAL_PAGES=0, SHOTB=new Map();
+function applySet(def){
+  SET=def; TEAMS=def.teams;
+  cards=def.cards.map(r=>({n:r[0],name:r[1],team:TEAMS[r[2]],sp:!!r[3],rc:!!r[4],par:r[5]||""}));
+  byN=new Map(cards.map(c=>[c.n,c])); idxOf=new Map(cards.map((c,i)=>[c.n,i]));
+  BASELINE=def.cards.filter(r=>r[6]).map(r=>r[0]);
+  /* card-front photos, packed into sheets: 10 x 5 upright cards per sheet, 5 across for sideways cards */
+  SHOT=new Map(); const dir=def.photoDir, port=def.port||[], land=def.land||[], lr=Math.max(1,Math.ceil(land.length/5));
+  port.forEach((n,k)=>SHOT.set(n,`background-image:url(${dir}/p${Math.floor(k/50)}.jpg);background-size:1000% 500%;background-position:${(k%10)/9*100}% ${Math.floor(k%50/10)/4*100}%`));
+  land.forEach((n,k)=>SHOT.set(n,`background-image:url(${dir}/land.jpg);background-size:500% ${lr*100}%;background-position:${(k%5)/4*100}% ${lr>1?Math.floor(k/5)/(lr-1)*100:0}%`));
+  LANDSET=new Set(land);
+  /* card-back photos (sideways cards): 5 x 10 per sheet */
+  SHOTB=new Map();
+  (def.backs||[]).forEach((n,k)=>SHOTB.set(n,`background-image:url(${dir}/bk${Math.floor(k/50)}.jpg);background-size:500% 1000%;background-position:${(k%5)/4*100}% ${Math.floor(k%50/5)/9*100}%`));
+  const bu=def.backUp||[];   // the few backs printed upright, packed side by side
+  bu.forEach((n,k)=>SHOTB.set(n,`background-image:url(${dir}/bkup.jpg);background-size:${bu.length*100}% 100%;background-position:${bu.length>1?k/(bu.length-1)*100:0}% 0%`));
+  BACKUP=new Set(bu);
+  /* a spread is two pages: the back of one sheet on the left and the front of the next on the right, as in a real binder */
+  SHEETS=Math.ceil(cards.length/9);
+  PAGES=[{t:"cover"}];
+  for(let k=0;k<SHEETS;k++)PAGES.push({t:"front",s:k},{t:"back",s:k});
+  PAGES.push({t:"teams"},{t:"want"},{t:"grid"});
+  TEAM_PAGE=PAGES.length-3; WANT_PAGE=TEAM_PAGE+1; GRID_PAGE=WANT_PAGE+1; TOTAL_PAGES=PAGES.length;
+}
+const COL={
+"Arizona Diamondbacks":["#A71930","#E3D4AD"],"Athletics":["#003831","#EFB21E"],"Atlanta Braves":["#13274F","#FFFFFF"],
+"Baltimore Orioles":["#DF4601","#1A1A1A"],"Boston Red Sox":["#BD3039","#FFFFFF"],"Chicago Cubs":["#0E3386","#FFFFFF"],
+"Chicago White Sox":["#27251F","#C4CED4"],"Cincinnati Reds":["#C6011F","#FFFFFF"],"Cleveland Guardians":["#00385D","#FFFFFF"],
+"Colorado Rockies":["#333366","#C4CED4"],"Detroit Tigers":["#0C2340","#FA4616"],"Houston Astros":["#002D62","#EB6E1F"],
+"Kansas City Royals":["#004687","#BD9B60"],"Los Angeles Angels":["#BA0021","#C4CED4"],"Los Angeles Dodgers":["#005A9C","#FFFFFF"],
+"Miami Marlins":["#00A3E0","#111111"],"Milwaukee Brewers":["#12284B","#FFC52F"],"Minnesota Twins":["#002B5C","#CFAC7A"],
+"New York Mets":["#002D72","#FF5910"],"New York Yankees":["#0C2340","#FFFFFF"],"Philadelphia Phillies":["#E81828","#FFFFFF"],
+"Pittsburgh Pirates":["#27251F","#FDB827"],"San Diego Padres":["#2F241D","#FFC425"],"San Francisco Giants":["#27251F","#FD5A1E"],
+"Seattle Mariners":["#0C2C56","#7FD4C6"],"St. Louis Cardinals":["#C41E3A","#FEDB00"],"Tampa Bay Rays":["#092C5C","#8FBCE6"],
+"Texas Rangers":["#003278","#FFFFFF"],"Toronto Blue Jays":["#134A8E","#FFFFFF"],"Washington Nationals":["#AB0003","#FFFFFF"],
+"Multiple (League Leaders)":["#5A4A1F","#F3D98B"],"Rookie Quad (multiple teams)":["#3B3F46","#E2B33C"],
+"League Leaders":["#5A4A1F","#F3D98B"],"Record Breakers":["#7A1F2B","#F2C14E"],"Father & Son":["#2E4A3A","#E8D9B0"],
+"All-Time All-Stars":["#1F3B73","#D7263D"],"AL/NL Champions":["#3B3F46","#E2B33C"],"World Series Champions":["#3B3F46","#E2B33C"]
+};
+const SPARK="radial-gradient(rgba(255,255,255,.95) 14%,transparent 16%) 0 0/5cqi 5cqi,";
+const FRAME={
+"red":"#c8202f","green":"#2e9e4f","dark green":"#14532d","light purple":"#b79cf0","gray":"#8a8f98","dark gray":"#4b5058","dark yellow":"#c99a06",
+"pink sparkle":SPARK+"#ff6fb5","silver sparkle":SPARK+"#b9bfc9","blue sparkle":SPARK+"#3b82f6",
+"chrome refractor":"linear-gradient(135deg,#ff8a8a,#ffd36e,#9df59d,#7ed6ff,#c6a1ff,#ff9bd2)"
+};
+
+/* ===== state ===== */
+const lsKey=y=>y===2026?"heritage26-binder":"heritage-binder-"+y;
+const HOSTED=!!(window.claude&&typeof window.claude.use==="function");   // inside Claude the collection is saved with the page
+/* stand-alone website with a shared online record (see cloud-config.js): everyone reads it, only the owner writes */
+const CLOUD=(!HOSTED&&window.HERITAGE_SITE)?window.HERITAGE_SITE:null;   // the hosted website: saved on the server, only the owner can change it
+let canEdit=!CLOUD, fbUser=null;
+let owned=new Set(), photos={}, rot={};
+function loadState(){
+  owned=new Set(BASELINE); photos={}; rot={};
+  try{const c=JSON.parse(localStorage.getItem(lsKey(SET.year))||"null");if(c&&Array.isArray(c.owned)){owned=new Set(c.owned);photos=c.photos||{};rot=c.rot||{}}}catch(e){}
+}
+function saveLocal(){try{localStorage.setItem(lsKey(SET.year),JSON.stringify({owned:[...owned],photos,rot}))}catch(e){}}
+function stateKey(){return [...owned].sort((a,b)=>a-b).join(",")+"|"+JSON.stringify(Object.keys(photos).sort().map(k=>[k,photos[k]]))+JSON.stringify(Object.keys(rot).sort().map(k=>[k,rot[k]]))}
+
+let cur=0, busy=false, wantQ="", wantF="all", wantScroll=0;
+const mq=window.matchMedia("(orientation:portrait) and (max-width:760px), (max-aspect-ratio:1/1)");
+let stacked=mq.matches;
+const reduced=window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+const sheetOf=n=>Math.floor(idxOf.get(n)/9);
+const pageOf=n=>1+2*sheetOf(n);          // the page showing this card's front
+const backLand=c=>SET.backLand!==false&&!BACKUP.has(c.n);
+const teamLabel=t=>t.startsWith("Multiple")?"League Leaders":t.startsWith("Rookie Quad")?"Rookie Quad":t;
+function mono(c){
+  if(c.team.startsWith("Multiple")||c.team==="League Leaders")return "LL";
+  if(c.team==="AL/NL Champions"||c.team==="World Series Champions")return "WS";
+  if(c.team.startsWith("Rookie Quad"))return "RC";
+  const w=c.name.replace(/\b(Jr|Sr|II|III)\.?$/,"").trim().split(/\s+/);
+  return (w[0][0]+(w.length>1?w[w.length-1][0]:"")).toUpperCase();
+}
+const isLand=c=>typeof rot[c.n]==="boolean"?rot[c.n]:(c.team.startsWith("Multiple")||LANDSET.has(c.n));
+function tagsOf(c){return [c.sp?"SP":"",c.rc?"RC":"",c.par].filter(Boolean)}
+
+/* ===== drawing ===== */
+function cardHTML(c){
+  const col=COL[c.team]||["#3B3F46","#E2B33C"], ph=photos[c.n], fr=FRAME[c.par.toLowerCase()];
+  const style=`--t1:${col[0]};--t2:${col[1]};${fr?`--frame:${fr};`:""}`;
+  const tags=tagsOf(c).join(" · ");
+  const label=`Card ${c.n}, ${c.name}${tags?", "+tags:""}`;
+  if(ph)return `<button type="button" class="card has-photo${isLand(c)?" land":""}" data-card="${c.n}" style="${style}" aria-label="${esc(label)}"><img src="/_blob/${encodeURIComponent(ph)}" alt="" loading="lazy"><span class="c-no">${c.n}</span></button>`;
+  if(SHOT.has(c.n))return `<button type="button" class="card has-photo${isLand(c)?" land":""}" data-card="${c.n}" style="${style}" aria-label="${esc(label)}"><span class="c-img" style="${SHOT.get(c.n)}"></span><span class="c-no">${c.n}</span></button>`;
+  return `<button type="button" class="card${isLand(c)?" land":""}" data-card="${c.n}" style="${style}" aria-label="${esc(label)}">
+    <span class="c-art"><span class="c-no">${c.n}</span><span class="c-mono">${mono(c)}</span><span class="c-team">${esc(teamLabel(c.team))}</span></span>
+    <span class="c-plate"><span class="c-name${c.name.length>24?" long":""}">${esc(c.name)}</span>${tags?`<span class="c-tags">${esc(tags)}</span>`:""}</span></button>`;
+}
+function backHTML(c){
+  const col=COL[c.team]||["#3B3F46","#E2B33C"], land=backLand(c)?" land":"";
+  const label=`Back of card ${c.n}, ${c.name}`;
+  if(SHOTB.has(c.n))return `<button type="button" class="card has-photo${land}" data-card="${c.n}" data-side="b" aria-label="${esc(label)}"><span class="c-img" style="${SHOTB.get(c.n)}"></span></button>`;
+  return `<button type="button" class="card back${land}" data-card="${c.n}" data-side="b" style="--t1:${col[0]==="#27251F"||col[0]==="#2F241D"?"#4b4a45":col[0]}" aria-label="${esc(label)}, stand-in until a photo is added">
+    <span class="b-head"><span class="b-no">${c.n}</span><span class="b-who"><span class="b-name${c.name.length>24?" long":""}">${esc(c.name)}</span><span class="b-team">${esc(teamLabel(c.team))}</span></span></span>
+    <span class="b-lines"><i></i><i></i><i></i><i></i><i></i></span>
+    <span class="b-foot">Card back · photo not added yet</span></button>`;
+}
+function slotHTML(c){
+  return `<button type="button" class="slot" data-card="${c.n}" aria-label="Empty pocket for card ${c.n}, ${esc(c.name)}"><span class="s-no">${c.n}</span><span class="s-name">${esc(c.name)}</span><span class="s-add">+ Add</span></button>`;
+}
+function pocketHTML(c,back){return `<div class="pocket">${owned.has(c.n)?(back?backHTML(c):cardHTML(c)):slotHTML(c)}</div>`}
+function coverHTML(){
+  const have=owned.size, backs=SHOTB.size;
+  return `<div class="cover"><p class="big">${SET.year}</p><h2>Topps Heritage</h2><p>${cards.length} cards in the style of the ${SET.year-49} set, nine to a sheet.</p>
+  <dl><dt>In the binder</dt><dd>${have} of ${cards.length}</dd><dt>How it reads</dt><dd>Like a real binder. The ${stacked?"lower":"right-hand"} page shows the fronts of a sheet. Turn it and the same nine cards show their backs ${stacked?"on the upper page":"on the left"}, mirrored the way they are when a sheet flips over.</dd><dt>Card backs</dt><dd>${backs?`${backs} of ${cards.length} have a real photo. The rest show a grey stand-in.`:"No photos yet. Each back shows a grey stand-in."}</dd></dl></div>
+  <div class="pg-foot"><span>Inside cover</span><span></span></div>`;
+}
+
+function rangeOf(k){return `${cards[k*9].n}–${cards[Math.min(cards.length,k*9+9)-1].n}`}
+function pageLabel(i){
+  const d=PAGES[i]; if(!d)return "";
+  return d.t==="front"?`Cards ${rangeOf(d.s)}`:d.t==="back"?`Backs ${rangeOf(d.s)}`:d.t==="teams"?"Team progress":d.t==="want"?"Cards to add":d.t==="grid"?`All ${cards.length} numbers`:"Inside cover";
+}
+function pageEl(i,side){
+  const p=document.createElement("section");
+  p.className="page "+side;
+  const d=PAGES[i];
+  if(!d){p.classList.add("blank");return p}
+  let h=`<div class="holes" aria-hidden="true"><i></i><i></i><i></i></div>`;
+  if(d.t==="front"||d.t==="back"){
+    const set=cards.slice(d.s*9,d.s*9+9), have=set.filter(c=>owned.has(c.n)).length;
+    let cells=set.map(c=>pocketHTML(c,d.t==="back"));
+    if(d.t==="back"){            // a flipped sheet is a mirror image: each row of three reads right to left
+      while(cells.length%3)cells.push(`<div class="gap"></div>`);
+      const m=[]; for(let r=0;r<cells.length;r+=3)m.push(cells[r+2],cells[r+1],cells[r]); cells=m;
+    }
+    h+=`<div class="grid9">${cells.join("")}</div><div class="pg-foot"><span>Sheet ${d.s+1} ${d.t==="back"?"back":"front"} · ${rangeOf(d.s)}</span><span>${have} of ${set.length}</span></div>`;
+  }else if(d.t==="cover")h+=coverHTML();
+  else if(d.t==="teams")h+=teamsHTML();
+  else if(d.t==="want")h+=wantHTML();
+  else h+=gridHTML();
+  p.innerHTML=h;
+  return p;
+}
+function teamsHTML(){
+  const m=new Map();
+  for(const c of cards){const t=m.get(c.team)||{t:0,h:0};t.t++;if(owned.has(c.n))t.h++;m.set(c.team,t)}
+  const rows=TEAMS.filter(t=>m.has(t)).map(t=>{const s=m.get(t), tc=COL[t]||["#6b7280","#E2B33C"];return `<div class="team${s.h===s.t?" done":""}" style="--tc:${tc[0]==="#27251F"||tc[0]==="#2F241D"?tc[1]:tc[0]}"><span>${esc(teamLabel(t))}</span><span>${s.h}/${s.t}</span><div class="tb"><i style="width:${100*s.h/s.t}%"></i></div></div>`}).join("");
+  return `<div class="bp-head"><h2>Team progress</h2><p>Cards in the binder out of each team's total.</p></div><div class="teams">${rows}</div><div class="pg-foot"><span>Summary</span><span></span></div>`;
+}
+function wantRows(){
+  const q=wantQ.trim().toLowerCase();
+  return cards.filter(c=>!owned.has(c.n)&&(wantF==="all"||(wantF==="sp")===c.sp)&&(!q||(c.n+" "+c.name+" "+c.team).toLowerCase().includes(q)));
+}
+function wantListHTML(){
+  const rows=wantRows();
+  if(!rows.length)return `<li class="empty">${owned.size===cards.length?"The set is complete. Nothing left to add.":"No missing cards match."}</li>`;
+  return rows.map(c=>`<li style="--tc:${(COL[c.team]||["#555"])[0]}"><span class="w-no">${c.n}</span><span class="w-txt"><span class="w-name">${esc(c.name)}${c.sp?'<span class="tag">SP</span>':""}${c.rc?'<span class="tag">RC</span>':""}</span><span class="w-team">${esc(teamLabel(c.team))}</span></span><button type="button" class="w-add" data-add="${c.n}" aria-label="Add card ${c.n}, ${esc(c.name)}, to the binder">Add</button></li>`).join("");
+}
+function wantHTML(){
+  const need=cards.length-owned.size;
+  const chip=(k,t)=>`<button type="button" class="chip" data-wf="${k}" aria-pressed="${wantF===k}">${t}</button>`;
+  return `<div class="bp-head"><h2>Cards to add <span id="wantCount">(${need})</span></h2><p>${canEdit?"Bought one? Press Add and it goes into its pocket.":"The cards this binder is still missing."}</p></div>
+  <div class="want-tools"><input type="search" id="wantSearch" placeholder="Search number, player or team" value="${esc(wantQ)}" aria-label="Search missing cards">${chip("all","All")}${chip("base","Base")}${chip("sp","SP")}</div>
+  <ul class="want-list" id="wantList">${wantListHTML()}</ul><div class="pg-foot"><span>Back page</span><span>${need} to go</span></div>`;
+}
+function gridHTML(){
+  return `<div class="bp-head"><h2>All ${cards.length} numbers</h2><p>${canEdit?"Press an open number to add that card. Press a filled one to see it.":"Filled numbers are in the binder. Press any number to see the card."}</p></div>
+  <div class="key"><span><i class="h"></i>In the binder</span><span><i></i>Missing</span><span><i class="s"></i>Short print</span></div>
+  <div class="numgrid" style="grid-template-rows:repeat(${Math.ceil(cards.length/16)},minmax(${cards.length>400?"5.2cqi":"0"},1fr))">${cards.map(c=>`<button type="button" class="num${owned.has(c.n)?" have":""}${c.sp?" sp":""}" data-num="${c.n}" title="#${c.n} ${esc(c.name)}" aria-label="Card ${c.n}, ${esc(c.name)}, ${owned.has(c.n)?"in the binder":"missing"}">${c.n}</button>`).join("")}</div><div class="pg-foot"><span>Back page</span><span>${owned.size} of ${cards.length}</span></div>`;
+}
+
+function render(){
+  if(!SET)return;
+  const wl=$("wantList"); if(wl)wantScroll=wl.scrollTop;
+  const sp=$("spread"); sp.replaceChildren();
+  $("binder").classList.toggle("stacked",stacked); document.body.classList.toggle("stacked",stacked);
+  sp.append(pageEl(cur,stacked?"right upper":"left"),pageEl(cur+1,stacked?"right lower":"right"));
+  const nl=$("wantList"); if(nl)nl.scrollTop=wantScroll;
+  updateChrome();
+}
+function updateChrome(){
+  const have=owned.size, need=cards.length-have;
+  $("haveN").textContent=have; $("totN").textContent=cards.length;
+  $("needN").textContent=need?need+" to go":"Set complete";
+  $("barFill").style.width=(100*have/cards.length)+"%";
+  const s=$("scrub"); s.max=TOTAL_PAGES/2-1; s.value=cur/2;
+  const L=PAGES[cur], Rt=PAGES[cur+1];
+  $("where").textContent=Rt.t==="front"?`Cards ${rangeOf(Rt.s)}`:Rt.t==="grid"?"Back page":`Backs ${rangeOf(L.s)}`;
+  $("prev").disabled=cur<=0;
+  $("next").disabled=cur>=TOTAL_PAGES-2;
+}
+
+/* ===== page turning ===== */
+function go(t){
+  if(!SET)return;
+  t=Math.max(0,Math.min(TOTAL_PAGES-1,t)); t-=t%2;
+  if(busy||t===cur){updateChrome();return}
+  const sp=$("spread");
+  if(reduced||stacked){
+    cur=t;render();
+    if(stacked){$("stage").scrollTop=0;if(!reduced){sp.classList.remove("swap");void sp.offsetWidth;sp.classList.add("swap")}}
+    return;
+  }
+  busy=true;
+  const fwd=t>cur, leaf=document.createElement("div");
+  leaf.className="leaf "+(fwd?"fwd":"back");
+  const face=(cls,el)=>{const f=document.createElement("div");f.className="face "+cls;f.append(el);return f};
+  const L=sp.querySelector(".page.left"), R2=sp.querySelector(".page.right");
+  if(fwd){R2.replaceWith(pageEl(t+1,"right"));leaf.append(face("f",pageEl(cur+1,"right")),face("b",pageEl(t,"left")))}
+  else{L.replaceWith(pageEl(t,"left"));leaf.append(face("f",pageEl(cur,"left")),face("b",pageEl(t+1,"right")))}
+  sp.append(leaf);
+  let done=false;
+  const end=()=>{if(done)return;done=true;cur=t;busy=false;render()};
+  leaf.addEventListener("animationend",end);
+  setTimeout(end,900);
+}
+const step=d=>go(cur+d*2);
+
+/* ===== add / remove ===== */
+function setOwned(n,on,quiet){
+  if(!canEdit){toast("Only this binder's owner can change it.");return}
+  if(on===owned.has(n))return;
+  on?owned.add(n):owned.delete(n);
+  persist({owned:{[n]:on}});
+  if(!busy)render();
+  const c=byN.get(n);
+  if(quiet)return;
+  if(on)toast(`Added #${n} ${c.name} to sheet ${sheetOf(n)+1}.`,[["View",()=>go(pageOf(n))],["Undo",()=>setOwned(n,false,true)]]);
+  else toast(`Took #${n} ${c.name} out of the binder.`,[["Undo",()=>setOwned(n,true,true)]]);
+}
+let toastTimer;
+function toast(msg,actions){
+  const t=$("toast"); t.replaceChildren(document.createTextNode(msg));
+  (actions||[]).forEach(([label,fn],i)=>{const b=document.createElement("button");b.type="button";b.textContent=label;if(i>0)b.className="ghost";b.onclick=()=>{t.hidden=true;fn()};t.append(b)});
+  t.hidden=false; clearTimeout(toastTimer); toastTimer=setTimeout(()=>{t.hidden=true},6500);
+}
+
+/* ===== card dialog ===== */
+let dlgN=null, dlgSide="f";
+function openCard(n,side){
+  dlgN=n; const c=byN.get(n), have=owned.has(n), ph=photos[n];
+  dlgSide=have&&side==="b"?"b":"f"; const bk=dlgSide==="b";
+  $("dCard").className="d-card"+(have&&(bk?backLand(c):isLand(c))?" land":"");
+  $("dCard").innerHTML=pocketHTML(c,bk);
+  const pg=sheetOf(n)+1, pk=idxOf.get(n)%9+1;
+  let b="";
+  if(have){
+    b+=`<button type="button" class="btn" data-act="flip">${bk?"See the front":"See the back"}</button>`;
+    if(assets&&!bk)b+=`<button type="button" class="btn gold" data-act="photo">${ph?"Replace photo":SHOT.has(n)?"Use my own photo":"Add a photo of your card"}</button>`;
+    if(assets&&ph&&!bk)b+=`<button type="button" class="btn" data-act="nophoto">${SHOT.has(n)?"Back to the stock photo":"Remove photo"}</button>`;
+    b+=`${bk?"":`<button type="button" class="btn" data-act="turn">${isLand(c)?"Turn upright":"Turn sideways"}</button>`}<button type="button" class="btn" data-act="goto">Go to sheet ${pg}</button><button type="button" class="btn danger" data-act="remove">Take out of binder</button>`;
+  }else b+=`<button type="button" class="btn gold" data-act="add">Add to binder</button><button type="button" class="btn" data-act="goto">Go to sheet ${pg}</button>`;
+  $("dInfo").innerHTML=`<h2 id="dTitle">#${c.n} ${esc(c.name)}</h2><p>${esc(teamLabel(c.team))}</p><p>${[c.sp?"Short print":"Base",c.rc?"Rookie card":"",c.par?c.par+" parallel":""].filter(Boolean).map(esc).join(" · ")}</p><p>${have?"In the binder":"Not in the binder yet"} · sheet ${pg}, pocket ${pk}${bk?(SHOTB.has(n)?" · back":" · back (stand-in, no photo yet)"):""}</p><div class="d-btns">${b}</div>${have&&!assets&&!SHOT.has(n)?'<p class="d-note">Photo uploads are available when you open this page signed in as its owner.</p>':""}<p class="d-note" id="dMsg" role="status"></p>`;
+  const d=$("dlg"); if(!d.open)d.showModal();
+}
+$("dClose").onclick=()=>$("dlg").close();
+$("dlg").addEventListener("click",e=>{
+  if(e.target===$("dlg")){$("dlg").close();return}
+  const a=e.target.closest("[data-act]"); if(!a||dlgN==null)return;
+  const n=dlgN, act=a.dataset.act;
+  if(act==="add"){setOwned(n,true,true);openCard(n)}
+  else if(act==="flip"){openCard(n,dlgSide==="b"?"f":"b")}
+  else if(act==="remove"){$("dlg").close();setOwned(n,false)}
+  else if(act==="goto"){$("dlg").close();go(pageOf(n)+(dlgSide==="b"?1:0))}
+  else if(act==="turn"&&canEdit){const v=!isLand(byN.get(n));rot[n]=v;persist({rot:{[n]:v}});if(!busy)render();openCard(n)}
+  else if(act==="photo"){$("photoFile").value="";$("photoFile").click()}
+  else if(act==="nophoto"){const old=photos[n];delete photos[n];persist({photos:{[n]:null}});if(old&&assets)assets.delete(old).catch(()=>{});render();openCard(n)}
+});
+$("photoFile").addEventListener("change",async e=>{
+  const f=e.target.files&&e.target.files[0], n=dlgN; if(!f||n==null||!assets)return;
+  const msg=$("dMsg"); if(msg)msg.textContent="Uploading photo…";
+  try{
+    const blob=await shrink(f), r=await assets.upload(blob), old=photos[n];
+    photos[n]=r.id; persist({photos:{[n]:r.id}});
+    if(old)assets.delete(old).catch(()=>{});
+    if(!busy)render(); if(dlgN===n&&$("dlg").open)openCard(n);
+  }catch(err){if($("dMsg"))$("dMsg").textContent="That photo could not be uploaded. Try a JPG or PNG under 20 MB."}
+});
+$("bulkBtn").onclick=()=>{$("bulkFile").value="";$("bulkFile").click()};
+$("bulkFile").addEventListener("change",async e=>{
+  const files=[...(e.target.files||[])]; if(!files.length||!assets)return;
+  let ok=0, skipped=0, failed=0, patch={};
+  const flush=()=>{if(Object.keys(patch).length){persist({photos:patch});patch={}}};
+  for(let i=0;i<files.length;i++){
+    const f=files[i], m=(f.name.replace(/\.[^.]*$/,"").match(/(?<!\d)\d{1,3}(?!\d)/g)||[]).map(Number).find(v=>byN.has(v));
+    if(!m){skipped++;continue}
+    toast(`Adding photos… ${i+1} of ${files.length}`);
+    try{
+      const r=await assets.upload(await shrink(f)), old=photos[m];
+      photos[m]=r.id; patch[m]=r.id; ok++;
+      if(old)assets.delete(old).catch(()=>{});
+      if(ok%10===0){flush();if(!busy)render()}
+    }catch(err){failed++}
+  }
+  flush(); if(!busy)render();
+  const waiting=Object.keys(photos).filter(k=>!owned.has(+k)).length;
+  toast(`Added ${ok} photo${ok===1?"":"s"}.`+(skipped?` ${skipped} skipped: no card number (1–400) in the file name.`:"")+(failed?` ${failed} could not be uploaded.`:"")+(waiting?` ${waiting} belong to cards not in the binder yet and will show once you add them.`:""));
+});
+async function shrink(file){
+  try{
+    const bmp=await createImageBitmap(file), k=Math.min(1,1200/Math.max(bmp.width,bmp.height));
+    const cv=document.createElement("canvas"); cv.width=Math.round(bmp.width*k); cv.height=Math.round(bmp.height*k);
+    cv.getContext("2d").drawImage(bmp,0,0,cv.width,cv.height);
+    const b=await new Promise(res=>cv.toBlob(res,"image/jpeg",.86));
+    return b?new File([b],"card.jpg",{type:"image/jpeg"}):file;
+  }catch(e){return file}
+}
+
+/* ===== events ===== */
+$("spread").addEventListener("click",e=>{
+  if(busy)return;
+  let el;
+  if((el=e.target.closest("[data-add]")))setOwned(+el.dataset.add,true);
+  else if((el=e.target.closest("[data-num]"))){const n=+el.dataset.num;owned.has(n)||!canEdit?openCard(n):setOwned(n,true)}
+  else if((el=e.target.closest("[data-wf]"))){wantF=el.dataset.wf;wantScroll=0;render()}
+  else if((el=e.target.closest("[data-card]")))openCard(+el.dataset.card,el.dataset.side);
+});
+$("spread").addEventListener("input",e=>{
+  if(e.target.id!=="wantSearch")return;
+  wantQ=e.target.value; const l=$("wantList"); if(l){l.innerHTML=wantListHTML();l.scrollTop=0}
+});
+$("prev").onclick=()=>step(-1); $("next").onclick=()=>step(1);
+$("scrub").addEventListener("change",e=>go(e.target.value*2));
+$("jumps").addEventListener("click",e=>{const b=e.target.closest("[data-jump]");if(b)go(+b.dataset.jump)});
+$("toAdd").onclick=()=>go(WANT_PAGE);
+document.addEventListener("keydown",e=>{
+  if($("dlg").open||/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))return;
+  if(e.key==="ArrowRight")step(1); else if(e.key==="ArrowLeft")step(-1);
+});
+let tx=null,ty=null;
+$("stage").addEventListener("touchstart",e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
+$("stage").addEventListener("touchend",e=>{
+  if(tx==null)return; const dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty; tx=null;
+  if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5&&!e.target.closest(".want-list"))step(dx<0?1:-1);
+},{passive:true});
+mq.addEventListener("change",()=>{stacked=mq.matches;busy=false;render()});
+
+
+/* ===== saving (kept with the page, one saved record per binder, so it follows you across devices) ===== */
+let db=null, assets=null, R=null, readOnly=false, chain=Promise.resolve(), pending=0, unsub=null, dbWait=null;
+function setSync(text,err){const s=$("sync");s.textContent=text;s.classList.toggle("err",!!err)}
+function fullDoc(){const o={};for(const n of owned)o[n]=true;return {owned:o,photos:{...photos},rot:{...rot}}}
+function persist(patch){
+  saveLocal();
+  const r=R; if(!r||readOnly||!canEdit)return;
+  const full=fullDoc();
+  pending++; setSync("Saving…");
+  chain=chain.then(async()=>{
+    const write=async()=>{
+      if(r.exists===null){const s=await r.ref.get();r.exists=s.exists}
+      if(r.exists)await r.ref.update(patch); else{await r.ref.set(full);r.exists=true}
+    };
+    try{
+      try{await write()}catch(e){if(e&&e.code==="unavailable"){await new Promise(z=>setTimeout(z,600+Math.random()*600));await write()}else throw e}
+      if(--pending===0)setSync("Saved");
+    }catch(e){
+      pending--;
+      if(e&&e.code==="invalid_argument"){readOnly=true;setSync("View only: changes are not saved",true)}
+      else setSync(e&&e.code==="auth"?"Signed out. Sign in again to save changes.":"Could not save that change",true);
+    }
+  });
+}
+function applyRemote(d){
+  const before=stateKey(), o=new Set();
+  if(d&&d.owned)for(const k in d.owned)if(d.owned[k]===true&&byN.has(+k))o.add(+k);
+  const p={}; if(d&&d.photos)for(const k in d.photos)if(typeof d.photos[k]==="string")p[k]=d.photos[k];
+  const r={}; if(d&&d.rot)for(const k in d.rot)if(typeof d.rot[k]==="boolean")r[k]=d.rot[k];
+  owned=o; photos=p; rot=r; saveLocal();
+  if(stateKey()!==before&&!busy)render();
+}
+function connect(){
+  if(dbWait)return dbWait;
+  dbWait=(async()=>{
+    if(CLOUD){try{db=await siteDb()}catch(e){db=null} return db}
+    if(!HOSTED)return null;
+    try{
+      db=await window.claude.use("db");
+      window.claude.use("assets").then(a=>{assets=a||null;$("bulkBtn").hidden=!assets}).catch(()=>{});
+    }catch(e){db=null}
+    return db;
+  })();
+  return dbWait;
+}
+async function subscribe(){
+  if(unsub){try{unsub()}catch(e){} unsub=null}
+  R=null;
+  const forSet=SET;
+  await connect();
+  if(forSet!==SET)return;
+  if(!db){setSync(HOSTED?"Changes stay on this device":CLOUD?"Binder server not reachable. Showing the built-in copy.":"Saved in this browser",!!CLOUD);return}
+  const r={ref:db.doc(SET.doc),exists:null}; R=r;
+  setSync("Loading your binder…");
+  const timer=setTimeout(()=>{if(R===r)setSync("Saved binder not reached yet. Showing the last copy.",true)},10000);
+  unsub=r.ref.onSnapshot(snap=>{
+    if(R!==r)return;
+    if(!snap.metadata.fromCache){clearTimeout(timer);r.exists=snap.exists;if(!pending&&!readOnly)setSync(CLOUD&&!canEdit?"Shared binder, up to date":"Saved")}
+    if(snap.exists&&!snap.metadata.hasPendingWrites)applyRemote(snap.data());
+  },()=>{clearTimeout(timer);if(R===r){setSync("Saving is unavailable right now",true);R=null}});
+}
+
+/* ===== switching binders ===== */
+function loadScript(src){return new Promise((ok,no)=>{const t=document.createElement("script");t.src=src;t.onload=ok;t.onerror=()=>no(new Error("load"));document.head.append(t)})}
+function buildJumps(){
+  let h=`<button class="btn" type="button" data-jump="0">#${cards[0].n}</button>`;
+  for(let i=99;i<cards.length-1;i+=100)h+=`<button class="btn" type="button" data-jump="${1+2*Math.floor(i/9)}">#${cards[i].n}</button>`;
+  $("jumps").innerHTML=h+`<button class="btn" type="button" data-jump="${TEAM_PAGE}">Teams</button><button class="btn" type="button" data-jump="${WANT_PAGE}">Back page</button>`;
+}
+let opening=false;
+async function openSet(year){
+  if(opening)return false; opening=true;
+  try{
+    if(!window.HERITAGE_SETS[year])await loadScript(READY[year]);
+    const def=window.HERITAGE_SETS[year]; if(!def)throw new Error("missing");
+    if($("dlg").open)$("dlg").close();
+    applySet(def); loadState();
+    cur=0; busy=false; wantQ=""; wantF="all"; wantScroll=0; dlgN=null;
+    $("setTitle").textContent=`${def.year} Topps Heritage`;
+    $("setSub").textContent=`${cards.length} cards · ${def.year-49} design`;
+    document.title=`${def.year} Heritage Binder`;
+    buildJumps(); render(); subscribe();
+    try{localStorage.setItem("heritage-last-binder",String(year))}catch(e){}
+    try{if(location.hash!=="#y"+year)location.hash="y"+year}catch(e){}
+    return true;
+  }catch(e){
+    if(!SET)$("setSub").textContent="This binder could not be loaded. Reload the page to try again.";
+    return false;
+  }finally{opening=false}
+}
+function drawShelf(){
+  $("shelfGrid").innerHTML=YEARS.map(y=>{
+    const ready=!!READY[y], open=SET&&SET.year===y;
+    const line=open?`Open now · ${owned.size} of ${cards.length}`:ready?"Ready to open":"Not set up yet";
+    return `<button type="button" class="spine${ready?" ready":""}${open?" open":""}" data-year="${y}"><b>${y}</b><span>${y-49} design</span><span>${line}</span></button>`;
+  }).join("");
+  $("shelfMsg").textContent="";
+}
+$("binderBtn").onclick=()=>{drawShelf();$("shelf").showModal()};
+$("shelfClose").onclick=()=>$("shelf").close();
+$("shelf").addEventListener("click",async e=>{
+  if(e.target===$("shelf")){$("shelf").close();return}
+  const b=e.target.closest("[data-year]"); if(!b)return;
+  const y=+b.dataset.year;
+  if(!READY[y]){$("shelfMsg").textContent=`The ${y} binder is not set up yet. Give Claude the ${y} Topps Heritage checklist (and card photos, if you have them) and it will be added here.`;return}
+  if(SET&&SET.year===y){$("shelf").close();return}
+  $("shelfMsg").textContent=`Opening ${y}…`;
+  if(await openSet(y))$("shelf").close(); else $("shelfMsg").textContent=`The ${y} binder could not be loaded. Check your connection and try again.`;
+});
+$("backupBox").hidden=HOSTED||!!CLOUD;
+$("ownerBox").hidden=!CLOUD;
+function paintOwner(){
+  document.body.classList.toggle("viewer",!canEdit);
+  $("toAdd").textContent=canEdit?"Add cards":"Cards needed";
+  if(!CLOUD)return;
+  $("ownerForm").hidden=!!fbUser; $("ownerOut").hidden=!fbUser;
+  $("signBtn").hidden=false; $("signBtn").textContent=fbUser?"Signed in":"Sign in";
+  $("bulkBtn").hidden=!(canEdit&&assets);
+  $("ownerMsg").textContent=canEdit?"Signed in as the owner. Cards you add or remove show up for everyone.":"Everyone sees this binder. Only its owner can add or remove cards.";
+  if(SET&&!busy)render();
+}
+$("signBtn").onclick=()=>{drawShelf();$("ownerBox").open=true;$("shelf").showModal();if(!fbUser)setTimeout(()=>$("ownerPass").focus(),50)};
+paintOwner();
+const TOKEN_KEY="heritage-owner-token";
+let token=null; try{token=localStorage.getItem(TOKEN_KEY)}catch(e){}
+function api(path,opt={}){
+  const h=Object.assign({},opt.headers||{}); if(token)h.Authorization="Bearer "+token;
+  return fetch("/api/"+path,Object.assign({},opt,{headers:h,cache:"no-store"}));
+}
+function setOwner(t){
+  token=t||null; try{t?localStorage.setItem(TOKEN_KEY,t):localStorage.removeItem(TOKEN_KEY)}catch(e){}
+  fbUser=t?{}:null; canEdit=!!t; assets=t?photoStore:null;
+  paintOwner();
+  if(canEdit&&R)persist({});
+}
+$("ownerForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  $("ownerMsg").textContent="Signing in…";
+  try{
+    const r=await fetch("/api/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:$("ownerPass").value})});
+    if(r.status===401){$("ownerMsg").textContent="That password did not work. Check it and try again.";return}
+    if(!r.ok)throw new Error("login");
+    $("ownerPass").value=""; setOwner((await r.json()).token);
+  }catch(err){$("ownerMsg").textContent="Sign-in is not reachable right now. Try again in a moment."}
+});
+$("ownerOut").onclick=()=>setOwner(null);
+const photoStore={
+  upload:async blob=>{const r=await api("photo",{method:"POST",headers:{"Content-Type":blob.type||"image/jpeg"},body:blob});if(r.status===401){setOwner(null);throw new Error("auth")}if(!r.ok)throw new Error("upload");return r.json()},
+  delete:async id=>{await api("photo?id="+encodeURIComponent(id),{method:"DELETE"})}
+};
+async function siteDb(){
+  if(token){try{const r=await api("me");if(r.ok)setOwner(token);else if(r.status===401)setOwner(null)}catch(e){}}
+  const wrap=(x,pend)=>({exists:!!x.exists,data:()=>x.data,metadata:{fromCache:false,hasPendingWrites:!!pend}});
+  const read=async key=>{const r=await api("collection?key="+encodeURIComponent(key));if(!r.ok)throw new Error("read");return r.json()};
+  const write=async(key,d,merge)=>{
+    const r=await api("collection?key="+encodeURIComponent(key)+(merge?"&merge=1":""),{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)});
+    if(r.status===401){setOwner(null);const e=new Error("auth");e.code="auth";throw e}
+    if(!r.ok){const e=new Error("write");e.code="unavailable";throw e}
+  };
+  return {doc:key=>({
+    get:async()=>wrap(await read(key)),
+    set:d=>write(key,d,false),
+    update:d=>write(key,d,true),
+    onSnapshot:(next,err)=>{
+      let stop=false, fails=0;
+      const tick=async()=>{
+        if(stop)return;
+        if(document.visibilityState==="visible"){
+          try{const x=await read(key);fails=0;if(!stop)next(wrap(x,pending>0))}
+          catch(e){if(++fails===3&&!stop)err(e)}
+        }
+        if(!stop)setTimeout(tick,canEdit?60000:20000);
+      };
+      tick();
+      const vis=()=>{if(document.visibilityState==="visible"&&!stop)read(key).then(x=>{if(!stop)next(wrap(x,pending>0))}).catch(()=>{})};
+      document.addEventListener("visibilitychange",vis);
+      return ()=>{stop=true;document.removeEventListener("visibilitychange",vis)};
+    }
+  })};
+}
+$("backupSave").onclick=()=>{
+  if(SET)saveLocal();
+  const sets={};
+  for(const y of YEARS){try{const v=JSON.parse(localStorage.getItem(lsKey(y))||"null");if(v&&Array.isArray(v.owned))sets[y]={owned:v.owned,rot:v.rot||{}}}catch(e){}}
+  if(SET&&!sets[SET.year])sets[SET.year]={owned:[...owned],rot};
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([JSON.stringify({heritageBinders:1,saved:new Date().toISOString(),sets},null,1)],{type:"application/json"}));
+  a.download="heritage-binders-backup.json"; document.body.append(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+  $("shelfMsg").textContent="Backup file saved to your downloads.";
+};
+$("backupLoad").onclick=()=>{$("backupFile").value="";$("backupFile").click()};
+$("backupFile").addEventListener("change",async e=>{
+  const f=e.target.files&&e.target.files[0]; if(!f)return;
+  try{
+    const d=JSON.parse(await f.text()); if(!d||d.heritageBinders!==1||!d.sets)throw new Error("format");
+    let n=0;
+    for(const y in d.sets){const v=d.sets[y];if(!v||!Array.isArray(v.owned))continue;
+      localStorage.setItem(lsKey(+y),JSON.stringify({owned:v.owned.filter(Number.isFinite),photos:{},rot:v.rot||{}}));n++}
+    if(SET){loadState();render()}
+    drawShelf(); $("shelfMsg").textContent=`Loaded ${n} binder${n===1?"":"s"} from the backup.`;
+  }catch(err){$("shelfMsg").textContent="That file is not a Heritage binders backup, or this browser would not store it."}
+});
+window.addEventListener("hashchange",()=>{const m=/^#y(\d{4})$/.exec(location.hash);if(m&&READY[+m[1]]&&(!SET||SET.year!==+m[1]))openSet(+m[1])});
+(function start(){
+  const ready=YEARS.filter(y=>READY[y]); let y=ready[0];
+  const m=/^#y(\d{4})$/.exec(location.hash);
+  if(m&&READY[+m[1]])y=+m[1];
+  else{try{const l=+localStorage.getItem("heritage-last-binder");if(READY[l])y=l}catch(e){}}
+  openSet(y);
+})();
+
+</script>
+</body>
+</html>
