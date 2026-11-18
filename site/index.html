@@ -88,6 +88,16 @@ body.viewer .w-add,body.viewer .s-add,body.viewer [data-act="add"],body.viewer [
 .stacked .rings{left:0}
 .rings i{display:block;width:26px;height:9px;margin-left:-13px;border-radius:5px;background:linear-gradient(#f4f5f7,#8d939c 55%,#5d636b);box-shadow:0 2px 3px rgba(0,0,0,.6)}
 .stacked .rings i{margin-left:-9px}
+/* phones and narrow windows: one page of card fronts at a time */
+.binder.single{--bw:min(100cqw - 30px,520px,max(300px,(100svh - 150px) * .75));width:var(--bw);height:calc(var(--bw) * 4 / 3);margin:0 auto}
+.single .rings{left:0}
+.single .rings i{margin-left:-9px}
+.single .page{inset:0;width:100%;border-radius:0 6px 6px 0}
+body.single .stage{overflow-y:auto;place-items:start center;padding:14px 0 18px}
+.spread.slideN{animation:slideN .22s ease-out}
+.spread.slideP{animation:slideP .22s ease-out}
+@keyframes slideN{from{transform:translateX(28px);opacity:.25}}
+@keyframes slideP{from{transform:translateX(-28px);opacity:.25}}
 
 .page{position:absolute;top:0;bottom:0;width:50%;background:var(--sheet);container-type:inline-size;display:flex;flex-direction:column;padding:4% 4% 1.5%;overflow:hidden}
 .page.left{left:0;padding-right:9%;border-radius:6px 0 0 6px;box-shadow:inset -18px 0 22px -16px rgba(0,0,0,.9)}
@@ -266,6 +276,7 @@ dialog::backdrop{background:rgba(5,9,7,.72)}
   .prog{min-width:150px}.prog-line b{font-size:1.05rem}
   .stage{container-type:inline-size;display:block;margin:4px 8px 6px}
   .binder{--bw:calc(100cqw - 26px);width:var(--bw);height:calc(var(--bw) / 1.5);margin:13px auto}
+  .binder.single{--bw:min(100cqw - 30px,560px);height:calc(var(--bw) * 4 / 3);margin:13px auto}
   .nav{position:sticky;bottom:0;z-index:20;flex-wrap:nowrap;padding:5px 14px;padding-bottom:max(5px,env(safe-area-inset-bottom));background:rgba(23,35,29,.95);border-top:1px solid rgba(255,255,255,.1)}
   .nav .turn{height:32px}
   .jumps{flex-wrap:nowrap}.jumps .btn{padding:4px 8px;font-size:.78rem}
@@ -374,6 +385,7 @@ function applySet(def){
   for(let k=0;k<SHEETS;k++)PAGES.push({t:"front",s:k},{t:"back",s:k});
   PAGES.push({t:"teams"},{t:"want"},{t:"grid"});
   TEAM_PAGE=PAGES.length-3; WANT_PAGE=TEAM_PAGE+1; GRID_PAGE=WANT_PAGE+1; TOTAL_PAGES=PAGES.length;
+  SEQ=PAGES.map((p,i)=>i).filter(i=>PAGES[i].t!=="back");
 }
 const COL={
 "Arizona Diamondbacks":["#A71930","#E3D4AD"],"Athletics":["#003831","#EFB21E"],"Atlanta Braves":["#13274F","#FFFFFF"],
@@ -412,8 +424,9 @@ function saveLocal(){try{localStorage.setItem(lsKey(SET.year),JSON.stringify({ow
 function stateKey(){return [...owned].sort((a,b)=>a-b).join(",")+"|"+JSON.stringify(Object.keys(photos).sort().map(k=>[k,photos[k]]))+JSON.stringify(Object.keys(rot).sort().map(k=>[k,rot[k]]))}
 
 let cur=0, busy=false, wantQ="", wantF="all", wantScroll=0;
-const mq=window.matchMedia("(orientation:portrait) and (max-width:760px), (max-aspect-ratio:1/1)");
-let stacked=mq.matches;
+const mq=window.matchMedia("(orientation:portrait) and (max-width:760px), (max-aspect-ratio:1/1), (orientation:landscape) and (max-height:560px)");
+let single=mq.matches, stacked=false;   // single: one front page at a time (phones); otherwise two-page spreads
+let SEQ=[];                             // the pages single view steps through: cover, each sheet's fronts, then the back pages
 const reduced=window.matchMedia("(prefers-reduced-motion:reduce)").matches;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
@@ -459,7 +472,7 @@ function pocketHTML(c,back){return `<div class="pocket">${owned.has(c.n)?(back?b
 function coverHTML(){
   const have=owned.size, backs=SHOTB.size;
   return `<div class="cover"><p class="big">${SET.year}</p><h2>Topps Heritage</h2><p>${cards.length} cards in the style of the ${SET.year-49} set, nine to a sheet.</p>
-  <dl><dt>In the binder</dt><dd>${have} of ${cards.length}</dd><dt>How it reads</dt><dd>Like a real binder. The ${stacked?"lower":"right-hand"} page shows the fronts of a sheet. Turn it and the same nine cards show their backs ${stacked?"on the upper page":"on the left"}, mirrored the way they are when a sheet flips over.</dd><dt>Card backs</dt><dd>${backs?`${backs} of ${cards.length} have a real photo. The rest show a grey stand-in.`:"No photos yet. Each back shows a grey stand-in."}</dd></dl></div>
+  <dl><dt>In the binder</dt><dd>${have} of ${cards.length}</dd><dt>How it reads</dt><dd>${single?"One sheet of nine card fronts at a time. Swipe or use the arrows to move through the binder, and tap a card to see it up close.":"Like a real binder. The right-hand page shows the fronts of a sheet. Turn it and the same nine cards show their backs on the left, mirrored the way they are when a sheet flips over."}</dd><dt>Card backs</dt><dd>${backs?`${backs} of ${cards.length} have a real photo. The rest show a grey stand-in.`:"No photos yet. Each back shows a grey stand-in."}</dd></dl></div>
   <div class="pg-foot"><span>Inside cover</span><span></span></div>`;
 }
 
@@ -522,7 +535,9 @@ function render(){
   const wl=$("wantList"); if(wl)wantScroll=wl.scrollTop;
   const sp=$("spread"); sp.replaceChildren();
   $("binder").classList.toggle("stacked",stacked); document.body.classList.toggle("stacked",stacked);
-  sp.append(pageEl(cur,stacked?"right upper":"left"),pageEl(cur+1,stacked?"right lower":"right"));
+  $("binder").classList.toggle("single",single); document.body.classList.toggle("single",single);
+  if(single)sp.append(pageEl(cur,"right single"));
+  else sp.append(pageEl(cur,stacked?"right upper":"left"),pageEl(cur+1,stacked?"right lower":"right"));
   const nl=$("wantList"); if(nl)nl.scrollTop=wantScroll;
   updateChrome();
 }
@@ -531,7 +546,13 @@ function updateChrome(){
   $("haveN").textContent=have; $("totN").textContent=cards.length;
   $("needN").textContent=need?need+" to go":"Set complete";
   $("barFill").style.width=(100*have/cards.length)+"%";
-  const s=$("scrub"); s.max=TOTAL_PAGES/2-1; s.value=cur/2;
+  const s=$("scrub");
+  if(single){
+    const k=SEQ.indexOf(cur), P=PAGES[cur]; s.max=SEQ.length-1; s.value=k;
+    $("where").textContent=P.t==="front"?`Cards ${rangeOf(P.s)}`:P.t==="cover"?"Inside cover":P.t==="teams"?"Teams":P.t==="want"?"Cards to add":"Back page";
+    $("prev").disabled=k<=0; $("next").disabled=k>=SEQ.length-1; return;
+  }
+  s.max=TOTAL_PAGES/2-1; s.value=cur/2;
   const L=PAGES[cur], Rt=PAGES[cur+1];
   $("where").textContent=Rt.t==="front"?`Cards ${rangeOf(Rt.s)}`:Rt.t==="grid"?"Back page":`Backs ${rangeOf(L.s)}`;
   $("prev").disabled=cur<=0;
@@ -541,9 +562,18 @@ function updateChrome(){
 /* ===== page turning ===== */
 function go(t){
   if(!SET)return;
-  t=Math.max(0,Math.min(TOTAL_PAGES-1,t)); t-=t%2;
-  if(busy||t===cur){updateChrome();return}
+  t=Math.max(0,Math.min(TOTAL_PAGES-1,t));
   const sp=$("spread");
+  if(single){
+    if(PAGES[t].t==="back")t-=1;
+    if(t===cur){updateChrome();return}
+    const fwd=t>cur; cur=t; busy=false; render();
+    $("stage").scrollTop=0;
+    sp.classList.remove("slideN","slideP"); void sp.offsetWidth; sp.classList.add(fwd?"slideN":"slideP");
+    return;
+  }
+  t-=t%2;
+  if(busy||t===cur){updateChrome();return}
   busy=true;
   const fwd=t>cur, leaf=document.createElement("div");
   leaf.className="leaf "+(stacked?(fwd?"up":"down"):(fwd?"fwd":"back"));
@@ -558,7 +588,7 @@ function go(t){
   leaf.addEventListener("animationend",end);
   setTimeout(end,900);
 }
-const step=d=>go(cur+d*2);
+const step=d=>{if(single){const k=SEQ.indexOf(cur);go(SEQ[Math.max(0,Math.min(SEQ.length-1,k+d))])}else go(cur+d*2)};
 
 /* ===== add / remove ===== */
 function setOwned(n,on,quiet){
@@ -664,7 +694,7 @@ $("spread").addEventListener("input",e=>{
   wantQ=e.target.value; const l=$("wantList"); if(l){l.innerHTML=wantListHTML();l.scrollTop=0}
 });
 $("prev").onclick=()=>step(-1); $("next").onclick=()=>step(1);
-$("scrub").addEventListener("change",e=>go(e.target.value*2));
+$("scrub").addEventListener("change",e=>go(single?SEQ[+e.target.value]:e.target.value*2));
 $("jumps").addEventListener("click",e=>{const b=e.target.closest("[data-jump]");if(b)go(+b.dataset.jump)});
 $("toAdd").onclick=()=>go(WANT_PAGE);
 document.addEventListener("keydown",e=>{
@@ -677,7 +707,7 @@ $("stage").addEventListener("touchend",e=>{
   if(tx==null)return; const dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty; tx=null;
   if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5&&!e.target.closest(".want-list"))step(dx<0?1:-1);
 },{passive:true});
-mq.addEventListener("change",()=>{stacked=mq.matches;busy=false;render()});
+mq.addEventListener("change",()=>{const was=single;single=mq.matches;busy=false;if(!single)cur-=cur%2;else if(!was&&PAGES[cur+1]&&PAGES[cur+1].t==="front")cur+=1;render()});
 
 
 /* ===== saving (kept with the page, one saved record per binder, so it follows you across devices) ===== */
@@ -745,7 +775,7 @@ async function subscribe(){
 /* ===== switching binders ===== */
 function loadScript(src){return new Promise((ok,no)=>{const t=document.createElement("script");t.src=src;t.onload=ok;t.onerror=()=>no(new Error("load"));document.head.append(t)})}
 function buildJumps(){
-  let h=`<button class="btn" type="button" data-jump="0">#${cards[0].n}</button>`;
+  let h=`<button class="btn" type="button" data-jump="1">#${cards[0].n}</button>`;
   for(let i=99;i<cards.length-1;i+=100)h+=`<button class="btn" type="button" data-jump="${1+2*Math.floor(i/9)}">#${cards[i].n}</button>`;
   $("jumps").innerHTML=h+`<button class="btn" type="button" data-jump="${TEAM_PAGE}">Teams</button><button class="btn" type="button" data-jump="${WANT_PAGE}">Back page</button>`;
 }
@@ -757,7 +787,7 @@ async function openSet(year){
     const def=window.HERITAGE_SETS[year]; if(!def)throw new Error("missing");
     if($("dlg").open)$("dlg").close();
     applySet(def); loadState();
-    cur=0; busy=false; wantQ=""; wantF="all"; wantScroll=0; dlgN=null;
+    cur=single?1:0; busy=false; wantQ=""; wantF="all"; wantScroll=0; dlgN=null;
     $("setTitle").textContent=`${def.year} Topps Heritage`;
     $("setSub").textContent=`${cards.length} cards · ${def.year-49} design`;
     document.title=`${def.year} Heritage Binder`;
