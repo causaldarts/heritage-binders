@@ -271,7 +271,7 @@ dialog::backdrop{background:rgba(5,9,7,.72)}
   .jumps{flex-wrap:nowrap}.jumps .btn{padding:4px 8px;font-size:.78rem}
   .toast{bottom:56px}
 }
-@media (prefers-reduced-motion:reduce){.leaf{animation-duration:.01s !important}.card{transition:none}.bar i{transition:none}}
+@media (prefers-reduced-motion:reduce){.leaf,.leaf .face::after{animation-duration:.38s !important}.card{transition:none}.bar i{transition:none}}
 </style>
 </head>
 <body>
@@ -544,7 +544,6 @@ function go(t){
   t=Math.max(0,Math.min(TOTAL_PAGES-1,t)); t-=t%2;
   if(busy||t===cur){updateChrome();return}
   const sp=$("spread");
-  if(reduced){cur=t;render();if(stacked)$("stage").scrollTop=0;return}
   busy=true;
   const fwd=t>cur, leaf=document.createElement("div");
   leaf.className="leaf "+(stacked?(fwd?"up":"down"):(fwd?"fwd":"back"));
