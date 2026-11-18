@@ -94,6 +94,12 @@ body.viewer .w-add,body.viewer .s-add,body.viewer [data-act="add"],body.viewer [
 html:has(body.single),body.single{height:100dvh;overflow:hidden;overscroll-behavior:none}
 .single .rings{left:0}
 .single .rings i{margin-left:-9px}
+/* phones: ghosted tap targets on each side of the page */
+.edge{position:absolute;top:67%;transform:translateY(-50%);z-index:10;width:30px;height:76px;padding:0;border:1px solid rgba(255,255,255,.16);border-radius:10px;background:rgba(10,12,14,.32);color:rgba(255,255,255,.7);font:600 1.7rem/1 var(--body);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .12s,opacity .12s}
+.edge.prev{left:4px}
+.edge.next{right:2px}
+.edge:active{background:rgba(226,179,60,.45);color:#fff}
+.edge:disabled{opacity:0;pointer-events:none}
 .single .page{inset:0;width:100%;border-radius:0 6px 6px 0}
 body.single .stage{overflow:hidden;place-items:center;padding:0}
 /* phones: slimmer header and one swipeable row of jump buttons, so the page gets the room */
@@ -326,6 +332,8 @@ dialog::backdrop{background:rgba(5,9,7,.72)}
   <div class="binder" id="binder">
     <div class="spread" id="spread"></div>
     <div class="rings" aria-hidden="true"><i></i><i></i><i></i></div>
+    <button class="edge prev" id="edgePrev" type="button" aria-label="Previous page" hidden>‹</button>
+    <button class="edge next" id="edgeNext" type="button" aria-label="Next page" hidden>›</button>
   </div>
 </main>
 
@@ -569,8 +577,10 @@ function updateChrome(){
   if(single){
     const k=SEQ.indexOf(cur), P=PAGES[cur]; s.max=SEQ.length-1; s.value=k;
     $("where").textContent=P.t==="front"?`Cards ${rangeOf(P.s)}`:P.t==="cover"?"Inside cover":P.t==="teams"?"Teams":P.t==="want"?"Cards to add":"Back page";
-    $("prev").disabled=k<=0; $("next").disabled=k>=SEQ.length-1; return;
+    $("prev").disabled=$("edgePrev").disabled=k<=0; $("next").disabled=$("edgeNext").disabled=k>=SEQ.length-1;
+    $("edgePrev").hidden=$("edgeNext").hidden=false; return;
   }
+  $("edgePrev").hidden=$("edgeNext").hidden=true;
   s.max=TOTAL_PAGES/2-1; s.value=cur/2;
   const L=PAGES[cur], Rt=PAGES[cur+1];
   $("where").textContent=Rt.t==="front"?`Cards ${rangeOf(Rt.s)}`:Rt.t==="grid"?"Back page":`Backs ${rangeOf(L.s)}`;
@@ -713,6 +723,7 @@ $("spread").addEventListener("input",e=>{
   wantQ=e.target.value; const l=$("wantList"); if(l){l.innerHTML=wantListHTML();l.scrollTop=0}
 });
 $("prev").onclick=()=>step(-1); $("next").onclick=()=>step(1);
+$("edgePrev").onclick=e=>{e.stopPropagation();step(-1)}; $("edgeNext").onclick=e=>{e.stopPropagation();step(1)};
 $("scrub").addEventListener("change",e=>go(single?SEQ[+e.target.value]:e.target.value*2));
 $("jumps").addEventListener("click",e=>{const b=e.target.closest("[data-jump]");if(b)go(+b.dataset.jump)});
 $("toAdd").onclick=()=>go(WANT_PAGE);
