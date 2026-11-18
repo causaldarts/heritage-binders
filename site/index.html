@@ -167,6 +167,20 @@ body.viewer .w-add,body.viewer .s-add,body.viewer [data-act="add"],body.viewer [
 .leaf.back{left:0;transform-origin:right center;animation:turnB .62s cubic-bezier(.4,.1,.3,1) forwards}
 @keyframes turnF{to{transform:rotateY(-180deg)}}
 @keyframes turnB{to{transform:rotateY(180deg)}}
+/* phone, pages stacked: the sheet flips over its middle hinge */
+.leaf.up{left:0;right:0;width:100%;top:50%;bottom:0;transform-origin:center top;animation:turnU .62s cubic-bezier(.4,.1,.3,1) forwards}
+.leaf.down{left:0;right:0;width:100%;top:0;bottom:50%;transform-origin:center bottom;animation:turnD .62s cubic-bezier(.4,.1,.3,1) forwards}
+.leaf.up .face.b,.leaf.down .face.b{transform:rotateX(180deg)}
+.stacked .leaf .page.upper,.stacked .leaf .page.lower{top:0;bottom:0;border:0;width:100%}
+@keyframes turnU{to{transform:rotateX(180deg)}}
+@keyframes turnD{to{transform:rotateX(-180deg)}}
+.stacked .spread{perspective:1800px}
+/* light falls off the sheet as it lifts, and comes back as it lands */
+.leaf .face::after{content:"";position:absolute;inset:0;background:#000;pointer-events:none;border-radius:inherit}
+.leaf .face.f::after{opacity:0;animation:shadeOut .62s ease-in forwards}
+.leaf .face.b::after{opacity:.4;animation:shadeIn .62s ease-out forwards}
+@keyframes shadeOut{to{opacity:.4}}
+@keyframes shadeIn{to{opacity:0}}
 
 /* ---------- back pages ---------- */
 .bp-head{flex:none;margin-bottom:2.5cqi}
@@ -530,21 +544,18 @@ function go(t){
   t=Math.max(0,Math.min(TOTAL_PAGES-1,t)); t-=t%2;
   if(busy||t===cur){updateChrome();return}
   const sp=$("spread");
-  if(reduced||stacked){
-    cur=t;render();
-    if(stacked){$("stage").scrollTop=0;if(!reduced){sp.classList.remove("swap");void sp.offsetWidth;sp.classList.add("swap")}}
-    return;
-  }
+  if(reduced){cur=t;render();if(stacked)$("stage").scrollTop=0;return}
   busy=true;
   const fwd=t>cur, leaf=document.createElement("div");
-  leaf.className="leaf "+(fwd?"fwd":"back");
+  leaf.className="leaf "+(stacked?(fwd?"up":"down"):(fwd?"fwd":"back"));
   const face=(cls,el)=>{const f=document.createElement("div");f.className="face "+cls;f.append(el);return f};
-  const L=sp.querySelector(".page.left"), R2=sp.querySelector(".page.right");
-  if(fwd){R2.replaceWith(pageEl(t+1,"right"));leaf.append(face("f",pageEl(cur+1,"right")),face("b",pageEl(t,"left")))}
-  else{L.replaceWith(pageEl(t,"left"));leaf.append(face("f",pageEl(cur,"left")),face("b",pageEl(t+1,"right")))}
+  const top=stacked?"right upper":"left", bot=stacked?"right lower":"right";
+  const L=sp.querySelector(stacked?".page.upper":".page.left"), R2=sp.querySelector(stacked?".page.lower":".page.right");
+  if(fwd){R2.replaceWith(pageEl(t+1,bot));leaf.append(face("f",pageEl(cur+1,bot)),face("b",pageEl(t,top)))}
+  else{L.replaceWith(pageEl(t,top));leaf.append(face("f",pageEl(cur,top)),face("b",pageEl(t+1,bot)))}
   sp.append(leaf);
   let done=false;
-  const end=()=>{if(done)return;done=true;cur=t;busy=false;render()};
+  const end=()=>{if(done)return;done=true;cur=t;busy=false;render();if(stacked&&$("stage").scrollTop>0)$("stage").scrollTo({top:0,behavior:"smooth"})};
   leaf.addEventListener("animationend",end);
   setTimeout(end,900);
 }
