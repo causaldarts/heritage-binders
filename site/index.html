@@ -414,7 +414,7 @@ dialog::backdrop{background:rgba(5,9,7,.72)}
 <script>
 /* ===== binders: one per Topps Heritage set. Each set that is set up lives in its own file under sets/ ===== */
 const YEARS=Array.from({length:26},(_,i)=>2026-i);
-const READY={"2026": "sets/2026.js", "2025": "sets/2025.js", "2024": "sets/2024.js", "2022": "sets/2022.js", "2023": "sets/2023.js"};           // year -> data file
+const READY={"2026": "sets/2026.js", "2025": "sets/2025.js", "2024": "sets/2024.js", "2020": "sets/2020.js", "2021": "sets/2021.js", "2022": "sets/2022.js", "2023": "sets/2023.js"};           // year -> data file
 window.HERITAGE_SETS=window.HERITAGE_SETS||{};
 let SET=null, TEAMS=[], cards=[], byN=new Map(), idxOf=new Map(), BASELINE=[], SHOT=new Map(), LANDSET=new Set();
 let BACKUP=new Set(), SHEETS=0, PAGES=[], TEAM_PAGE=0, WANT_PAGE=0, GRID_PAGE=0, TOTAL_PAGES=0, SHOTB=new Map();
