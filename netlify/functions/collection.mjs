@@ -1,10 +1,10 @@
-// One saved record per binder: { owned: {n: true}, photos: {n: id}, rot: {n: bool} }.
+// One saved record per binder: { owned: {n: true}, photos: {n: id}, rot: {n: bool}, price: {n: dollars} }.
 // Anyone can read it; only the signed-in owner can change it.
 import { getStore } from "@netlify/blobs";
 import { isOwner, json } from "../lib/auth.mjs";
 
 const KEY = /^binder\/collection(-\d{4})?$/;
-const FIELDS = ["owned", "photos", "rot"];
+const FIELDS = ["owned", "photos", "rot", "price"];
 
 function clean(d) {
   const out = {};
@@ -15,6 +15,7 @@ function clean(d) {
     for (const k of Object.keys(src)) {
       if (!/^\d{1,4}$/.test(k)) continue;
       const v = src[k];
+      if (f === "price") { if (v === null || (typeof v === "number" && isFinite(v) && v >= 0 && v <= 100000)) out[f][k] = v; continue; }
       if (v === null || typeof v === "boolean" || (typeof v === "string" && /^[\w-]{1,80}$/.test(v))) out[f][k] = v;
     }
   }

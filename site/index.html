@@ -280,6 +280,11 @@ dialog::backdrop{background:rgba(5,9,7,.72)}
 .d-info h2{margin:0 0 4px;font:700 1.5rem/1.1 var(--display);text-wrap:balance}
 .d-info p{margin:0 0 4px;color:var(--muted);font-size:.95rem}
 .d-btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.d-price{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.d-price b{color:var(--gold);font-weight:700}.d-price i{font-style:normal;color:var(--muted);font-size:.85em;margin-left:4px}
+.d-price-form{display:flex;gap:6px;flex-wrap:wrap}
+.d-price-form input{width:110px;background:#090a0c;border:1px solid #333a36;border-radius:6px;color:var(--ink);font:500 15px var(--body);padding:6px 8px}
+.w-price{flex:none;font:600 13px var(--cond);color:var(--gold);margin-right:6px;letter-spacing:.03em}
 .d-note{font-size:.85rem;margin-top:12px !important}
 .d-close{position:absolute;top:8px;right:10px;border:0;background:none;font-size:1.5rem;line-height:1;cursor:pointer;color:var(--muted);padding:4px 8px}
 
@@ -465,13 +470,13 @@ const HOSTED=!!(window.claude&&typeof window.claude.use==="function");   // insi
 /* stand-alone website with a shared online record (see cloud-config.js): everyone reads it, only the owner writes */
 const CLOUD=(!HOSTED&&window.HERITAGE_SITE)?window.HERITAGE_SITE:null;   // the hosted website: saved on the server, only the owner can change it
 let canEdit=!CLOUD, fbUser=null;
-let owned=new Set(), photos={}, rot={};
+let owned=new Set(), photos={}, rot={}, price={};   // price: the owner's own buy prices, which win over the set's estimates
 function loadState(){
-  owned=new Set(BASELINE); photos={}; rot={};
-  try{const c=JSON.parse(localStorage.getItem(lsKey(SET.year))||"null");if(c&&Array.isArray(c.owned)){owned=new Set(c.owned);photos=c.photos||{};rot=c.rot||{}}}catch(e){}
+  owned=new Set(BASELINE); photos={}; rot={}; price={};
+  try{const c=JSON.parse(localStorage.getItem(lsKey(SET.year))||"null");if(c&&Array.isArray(c.owned)){owned=new Set(c.owned);photos=c.photos||{};rot=c.rot||{};price=c.price||{}}}catch(e){}
 }
-function saveLocal(){try{localStorage.setItem(lsKey(SET.year),JSON.stringify({owned:[...owned],photos,rot}))}catch(e){}}
-function stateKey(){return [...owned].sort((a,b)=>a-b).join(",")+"|"+JSON.stringify(Object.keys(photos).sort().map(k=>[k,photos[k]]))+JSON.stringify(Object.keys(rot).sort().map(k=>[k,rot[k]]))}
+function saveLocal(){try{localStorage.setItem(lsKey(SET.year),JSON.stringify({owned:[...owned],photos,rot,price}))}catch(e){}}
+function stateKey(){return [...owned].sort((a,b)=>a-b).join(",")+"|"+JSON.stringify(Object.keys(photos).sort().map(k=>[k,photos[k]]))+JSON.stringify(Object.keys(rot).sort().map(k=>[k,rot[k]]))+JSON.stringify(Object.keys(price).sort().map(k=>[k,price[k]]))}
 
 let cur=0, busy=false, wantQ="", wantF="all", wantScroll=0;
 const mq=window.matchMedia("(orientation:portrait) and (max-width:760px), (max-aspect-ratio:1/1), (orientation:landscape) and (max-height:560px)");
@@ -495,6 +500,11 @@ function mono(c){
 }
 const isLand=c=>typeof rot[c.n]==="boolean"?rot[c.n]:(c.team.startsWith("Multiple")||LANDSET.has(c.n));
 function tagsOf(c){return [c.sp?"SP":"",c.rc?"RC":"",c.par].filter(Boolean)}
+/* buy prices: the owner's own price, else the set's figure (a recent sale or an estimate) */
+function priceOf(n){if(typeof price[n]==="number")return price[n];const p=SET.prices&&SET.prices[n];return typeof p==="number"?p:null}
+function priceKind(n){return typeof price[n]==="number"?(canEdit?"your price":"owner's price"):(SET.priceReal||[]).includes(n)?"recent sale":SET.prices&&SET.prices[n]!=null?"estimate":""}
+const money=v=>"$"+(v>=100?Math.round(v).toLocaleString():v.toFixed(2));
+function priceTotals(){let need=0,have=0,any=false;for(const c of cards){const p=priceOf(c.n);if(p==null)continue;any=true;owned.has(c.n)?have+=p:need+=p}return any?{need,have}:null}
 
 /* ===== drawing ===== */
 function cardHTML(c){
@@ -524,7 +534,7 @@ function pocketHTML(c,back){return `<div class="pocket">${owned.has(c.n)?(back?b
 function coverHTML(){
   const have=owned.size, backs=SHOTB.size;
   return `<div class="cover"><p class="big">${SET.year}</p><h2>Topps Heritage</h2><p>${cards.length} cards in the style of the ${SET.year-49} set, nine to a sheet.</p>
-  <dl><dt>In the binder</dt><dd>${have} of ${cards.length}</dd><dt>How it reads</dt><dd>${single?"One sheet of nine card fronts at a time. Swipe or use the arrows to move through the binder, and tap a card to see it up close.":"Like a real binder. The right-hand page shows the fronts of a sheet. Turn it and the same nine cards show their backs on the left, mirrored the way they are when a sheet flips over."}</dd><dt>Card backs</dt><dd>${backs?`${backs} of ${cards.length} have a real photo. The rest show a grey stand-in.`:"No photos yet. Each back shows a grey stand-in."}</dd></dl></div>
+  <dl><dt>In the binder</dt><dd>${have} of ${cards.length}</dd>${(t=>t?`<dt>Buy prices</dt><dd>About ${money(t.have)} in the binder, about ${money(t.need)} to finish.</dd>`:"")(priceTotals())}<dt>How it reads</dt><dd>${single?"One sheet of nine card fronts at a time. Swipe or use the arrows to move through the binder, and tap a card to see it up close.":"Like a real binder. The right-hand page shows the fronts of a sheet. Turn it and the same nine cards show their backs on the left, mirrored the way they are when a sheet flips over."}</dd><dt>Card backs</dt><dd>${backs?`${backs} of ${cards.length} have a real photo. The rest show a grey stand-in.`:"No photos yet. Each back shows a grey stand-in."}</dd></dl></div>
   <div class="pg-foot"><span>Inside cover</span><span></span></div>`;
 }
 
@@ -567,12 +577,13 @@ function wantRows(){
 function wantListHTML(){
   const rows=wantRows();
   if(!rows.length)return `<li class="empty">${owned.size===cards.length?"The set is complete. Nothing left to add.":"No missing cards match."}</li>`;
-  return rows.map(c=>`<li style="--tc:${(COL[c.team]||["#555"])[0]}"><span class="w-no">${c.n}</span><span class="w-txt"><span class="w-name">${esc(c.name)}${c.sp?'<span class="tag">SP</span>':""}${c.rc?'<span class="tag">RC</span>':""}</span><span class="w-team">${esc(teamLabel(c.team))}</span></span><button type="button" class="w-add" data-add="${c.n}" aria-label="Add card ${c.n}, ${esc(c.name)}, to the binder">Add</button></li>`).join("");
+  return rows.map(c=>`<li style="--tc:${(COL[c.team]||["#555"])[0]}"><span class="w-no">${c.n}</span><span class="w-txt"><span class="w-name">${esc(c.name)}${c.sp?'<span class="tag">SP</span>':""}${c.rc?'<span class="tag">RC</span>':""}</span><span class="w-team">${esc(teamLabel(c.team))}</span></span>${priceOf(c.n)!=null?`<span class="w-price" title="${priceKind(c.n)}">${money(priceOf(c.n))}</span>`:""}<button type="button" class="w-add" data-add="${c.n}" aria-label="Add card ${c.n}, ${esc(c.name)}, to the binder">Add</button></li>`).join("");
 }
 function wantHTML(){
   const need=cards.length-owned.size;
   const chip=(k,t)=>`<button type="button" class="chip" data-wf="${k}" aria-pressed="${wantF===k}">${t}</button>`;
-  return `<div class="bp-head"><h2>Cards to add <span id="wantCount">(${need})</span></h2><p>${canEdit?"Bought one? Press Add and it goes into its pocket.":"The cards this binder is still missing."}</p></div>
+  const t=priceTotals();
+  return `<div class="bp-head"><h2>Cards to add <span id="wantCount">(${need})</span></h2><p>${canEdit?"Bought one? Press Add and it goes into its pocket.":"The cards this binder is still missing."}${t&&need?` About <b>${money(t.need)}</b> to finish at current buy prices.`:""}</p></div>
   <div class="want-tools"><input type="search" id="wantSearch" placeholder="Search number, player or team" value="${esc(wantQ)}" aria-label="Search missing cards">${chip("all","All")}${chip("base","Base")}${chip("sp","SP")}</div>
   <ul class="want-list" id="wantList">${wantListHTML()}</ul><div class="pg-foot"><span>Back page</span><span>${need} to go</span></div>`;
 }
@@ -678,10 +689,18 @@ function openCard(n,side){
     if(assets&&ph&&!bk)b+=`<button type="button" class="btn" data-act="nophoto">${SHOT.has(n)?"Back to the stock photo":"Remove photo"}</button>`;
     b+=`${bk?"":`<button type="button" class="btn" data-act="turn">${isLand(c)?"Turn upright":"Turn sideways"}</button>`}<button type="button" class="btn" data-act="goto">Go to sheet ${pg}</button><button type="button" class="btn danger" data-act="remove">Take out of binder</button>`;
   }else b+=`<button type="button" class="btn gold" data-act="add">Add to binder</button><button type="button" class="btn" data-act="goto">Go to sheet ${pg}</button>`;
-  $("dInfo").innerHTML=`<h2 id="dTitle">#${c.n} ${esc(c.name)}</h2><p>${esc(teamLabel(c.team))}</p><p>${[c.sp?"Short print":"Base",c.rc?"Rookie card":"",c.par?c.par+" parallel":""].filter(Boolean).map(esc).join(" · ")}</p><p>${have?"In the binder":"Not in the binder yet"} · sheet ${pg}, pocket ${pk}${bk?(SHOTB.has(n)?" · back":" · back (stand-in, no photo yet)"):""}</p><div class="d-btns">${b}</div>${have&&!assets&&!SHOT.has(n)?'<p class="d-note">Photo uploads are available when you open this page signed in as its owner.</p>':""}<p class="d-note" id="dMsg" role="status"></p>`;
+  $("dInfo").innerHTML=`<h2 id="dTitle">#${c.n} ${esc(c.name)}</h2><p>${esc(teamLabel(c.team))}</p><p>${[c.sp?"Short print":"Base",c.rc?"Rookie card":"",c.par?c.par+" parallel":""].filter(Boolean).map(esc).join(" · ")}</p><p>${have?"In the binder":"Not in the binder yet"} · sheet ${pg}, pocket ${pk}${bk?(SHOTB.has(n)?" · back":" · back (stand-in, no photo yet)"):""}</p>${(p=>p==null&&!canEdit?"":`<div class="d-price"><span>Buy price <b>${p==null?"not set":money(p)}</b>${p!=null?` <i>${priceKind(n)}</i>`:""}</span>${canEdit?`<form class="d-price-form" data-pricefor="${n}"><input type="number" min="0" step="0.01" inputmode="decimal" placeholder="Your price" aria-label="Set your buy price for card ${n}" value="${typeof price[n]==="number"?price[n]:""}"><button class="btn" type="submit">Save</button>${typeof price[n]==="number"?'<button class="btn" type="button" data-act="noprice">Use estimate</button>':""}</form>`:""}</div>`)(priceOf(n))}<div class="d-btns">${b}</div>${have&&!assets&&!SHOT.has(n)?'<p class="d-note">Photo uploads are available when you open this page signed in as its owner.</p>':""}<p class="d-note" id="dMsg" role="status"></p>`;
   const d=$("dlg"); if(!d.open)d.showModal();
 }
 $("dClose").onclick=()=>$("dlg").close();
+$("dlg").addEventListener("submit",e=>{
+  const f=e.target.closest("[data-pricefor]"); if(!f)return;
+  e.preventDefault(); if(!canEdit)return;
+  const n=+f.dataset.pricefor, v=parseFloat(f.querySelector("input").value);
+  if(!isFinite(v)||v<0||v>100000){$("dMsg").textContent="Enter a price like 2.50.";return}
+  price[n]=Math.round(v*100)/100; persist({price:{[n]:price[n]}}); if(!busy)render(); openCard(n,dlgSide);
+  $("dMsg").textContent="Saved your price.";
+});
 $("dlg").addEventListener("click",e=>{
   if(e.target===$("dlg")){$("dlg").close();return}
   const a=e.target.closest("[data-act]"); if(!a||dlgN==null)return;
@@ -690,6 +709,7 @@ $("dlg").addEventListener("click",e=>{
   else if(act==="flip"){openCard(n,dlgSide==="b"?"f":"b")}
   else if(act==="remove"){$("dlg").close();setOwned(n,false)}
   else if(act==="goto"){$("dlg").close();go(pageOf(n)+(dlgSide==="b"?1:0))}
+  else if(act==="noprice"&&canEdit){delete price[n];persist({price:{[n]:null}});if(!busy)render();openCard(n,dlgSide)}
   else if(act==="turn"&&canEdit){const v=!isLand(byN.get(n));rot[n]=v;persist({rot:{[n]:v}});if(!busy)render();openCard(n)}
   else if(act==="photo"){$("photoFile").value="";$("photoFile").click()}
   else if(act==="nophoto"){const old=photos[n];delete photos[n];persist({photos:{[n]:null}});if(old&&assets)assets.delete(old).catch(()=>{});render();openCard(n)}
@@ -811,7 +831,7 @@ mq.addEventListener("change",()=>{const was=single;single=mq.matches;busy=false;
 /* ===== saving (kept with the page, one saved record per binder, so it follows you across devices) ===== */
 let db=null, assets=null, R=null, readOnly=false, chain=Promise.resolve(), pending=0, unsub=null, dbWait=null;
 function setSync(text,err){const s=$("sync");s.textContent=text;s.classList.toggle("err",!!err)}
-function fullDoc(){const o={};for(const n of owned)o[n]=true;return {owned:o,photos:{...photos},rot:{...rot}}}
+function fullDoc(){const o={};for(const n of owned)o[n]=true;return {owned:o,photos:{...photos},rot:{...rot},price:{...price}}}
 function persist(patch){
   saveLocal();
   const r=R; if(!r||readOnly||!canEdit)return;
@@ -837,7 +857,8 @@ function applyRemote(d){
   if(d&&d.owned)for(const k in d.owned)if(d.owned[k]===true&&byN.has(+k))o.add(+k);
   const p={}; if(d&&d.photos)for(const k in d.photos)if(typeof d.photos[k]==="string")p[k]=d.photos[k];
   const r={}; if(d&&d.rot)for(const k in d.rot)if(typeof d.rot[k]==="boolean")r[k]=d.rot[k];
-  owned=o; photos=p; rot=r; saveLocal();
+  const pr={}; if(d&&d.price)for(const k in d.price)if(typeof d.price[k]==="number")pr[k]=d.price[k];
+  owned=o; photos=p; rot=r; price=pr; saveLocal();
   if(stateKey()!==before&&!busy)render();
 }
 function connect(){
