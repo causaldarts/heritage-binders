@@ -414,7 +414,7 @@ dialog::backdrop{background:rgba(5,9,7,.72)}
 <script>
 /* ===== binders: one per Topps Heritage set. Each set that is set up lives in its own file under sets/ ===== */
 const YEARS=Array.from({length:26},(_,i)=>2026-i);
-const READY={"2026": "sets/2026.js", "2025": "sets/2025.js", "2024": "sets/2024.js"};           // year -> data file
+const READY={"2026": "sets/2026.js", "2025": "sets/2025.js", "2024": "sets/2024.js", "2023": "sets/2023.js"};           // year -> data file
 window.HERITAGE_SETS=window.HERITAGE_SETS||{};
 let SET=null, TEAMS=[], cards=[], byN=new Map(), idxOf=new Map(), BASELINE=[], SHOT=new Map(), LANDSET=new Set();
 let BACKUP=new Set(), SHEETS=0, PAGES=[], TEAM_PAGE=0, WANT_PAGE=0, GRID_PAGE=0, TOTAL_PAGES=0, SHOTB=new Map();
@@ -455,7 +455,7 @@ const COL={
 "Texas Rangers":["#003278","#FFFFFF"],"Toronto Blue Jays":["#134A8E","#FFFFFF"],"Washington Nationals":["#AB0003","#FFFFFF"],
 "Multiple (League Leaders)":["#5A4A1F","#F3D98B"],"Rookie Quad (multiple teams)":["#3B3F46","#E2B33C"],
 "League Leaders":["#5A4A1F","#F3D98B"],"Record Breakers":["#7A1F2B","#F2C14E"],"Father & Son":["#2E4A3A","#E8D9B0"],
-"All-Time All-Stars":["#1F3B73","#D7263D"],"Oakland Athletics":["#003831","#EFB21E"],"Season Highlights":["#7A1F2B","#F2C14E"],"MVPs":["#1F3B73","#E2B33C"],"Postseason Highlights":["#3B3F46","#E2B33C"],"World Series Highlights":["#3B3F46","#E2B33C"],"AL/NL Champions":["#3B3F46","#E2B33C"],"World Series Champions":["#3B3F46","#E2B33C"]
+"All-Time All-Stars":["#1F3B73","#D7263D"],"Oakland Athletics":["#003831","#EFB21E"],"Cleveland Indians":["#0C2340","#E31937"],"Florida Marlins":["#00A3E0","#111111"],"Montreal Expos":["#003087","#E4002B"],"Anaheim Angels":["#BA0021","#C4CED4"],"Tampa Bay Devil Rays":["#092C5C","#8FBCE6"],"All-Stars":["#1F3B73","#D7263D"],"Rookie Stars (multiple teams)":["#3B3F46","#E2B33C"],"Team Leaders":["#2E4A3A","#E8D9B0"],"Checklists":["#3B3F46","#E8D9B0"],"Team Cards":["#2E4A3A","#E8D9B0"],"Champions":["#3B3F46","#E2B33C"],"In Action":["#7A1F2B","#F2C14E"],"Season Highlights":["#7A1F2B","#F2C14E"],"MVPs":["#1F3B73","#E2B33C"],"Postseason Highlights":["#3B3F46","#E2B33C"],"World Series Highlights":["#3B3F46","#E2B33C"],"AL/NL Champions":["#3B3F46","#E2B33C"],"World Series Champions":["#3B3F46","#E2B33C"]
 };
 const SPARK="radial-gradient(rgba(255,255,255,.95) 14%,transparent 16%) 0 0/5cqi 5cqi,";
 const FRAME={
@@ -494,7 +494,8 @@ function mono(c){
   if(c.team==="AL/NL Champions"||c.team==="World Series Champions"||c.team==="World Series Highlights")return "WS";
   if(c.team==="Postseason Highlights")return "PS";
   if(c.team==="MVPs")return "MVP";
-  if(c.team.startsWith("Rookie Quad"))return "RC";
+  if(c.team.startsWith("Rookie Quad")||c.team.startsWith("Rookie Stars"))return "RC";
+  if(c.team==="All-Stars")return "AS";
   const w=c.name.replace(/\b(Jr|Sr|II|III)\.?$/,"").trim().split(/\s+/);
   return (w[0][0]+(w.length>1?w[w.length-1][0]:"")).toUpperCase();
 }
