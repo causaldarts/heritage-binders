@@ -42,6 +42,18 @@ button{font:inherit;color:inherit}
 .brand-p{margin-top:2px;font:500 .8rem var(--cond);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
 .brand-sw{font:600 .78rem var(--cond);letter-spacing:.07em;text-transform:uppercase;color:#221a04;background:var(--gold);border-radius:5px;padding:4px 8px;white-space:nowrap}
 #shelf{width:min(720px,calc(100% - 32px))}
+#quick{width:min(520px,calc(100% - 24px))}
+#quick h2{margin:0 0 4px;font:600 1.5rem var(--display)}
+.quick-form{display:flex;gap:8px;margin:14px 0 10px}
+.quick-form input{flex:1;min-width:0;background:#090a0c;border:1px solid #333a36;border-radius:8px;color:var(--ink);font:500 17px var(--body);padding:10px 12px}
+.quick-form input:focus{outline:2px solid var(--gold);outline-offset:1px}
+.quick-out{min-height:1.4em;font-size:.95rem;line-height:1.45}
+.quick-out p{margin:4px 0}
+.quick-out .ok{color:#8fd19e}.quick-out .meh{color:var(--muted)}.quick-out .bad{color:var(--bad)}
+.quick-out ul{list-style:none;margin:6px 0 0;padding:0;max-height:180px;overflow:auto;font-size:.88rem;color:var(--muted)}
+.quick-out li{padding:2px 0}.quick-out li b{color:var(--ink);font-weight:600}
+.quick-foot{margin:12px 0 0}
+.linkish{background:none;border:0;padding:0;color:var(--gold);text-decoration:underline;cursor:pointer;font:inherit}
 #shelf h2{margin:0 0 4px;font:700 1.4rem/1.1 var(--display)}
 .shelf-sub{margin:0 0 14px;color:var(--muted);font-size:.92rem}
 .shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px;max-height:min(58vh,460px);overflow-y:auto;padding:2px}
@@ -357,6 +369,17 @@ dialog::backdrop{background:rgba(5,9,7,.72)}
   <input type="file" id="bulkFile" accept="image/*" multiple hidden>
 </dialog>
 
+<dialog id="quick" aria-labelledby="quickTitle">
+  <button class="d-close" id="quickClose" type="button" aria-label="Close">×</button>
+  <h2 id="quickTitle">Quick add</h2>
+  <p class="shelf-sub">Type the card numbers you picked up. Separate them with commas or spaces; ranges like 501-505 work too.</p>
+  <form class="quick-form" id="quickForm" autocomplete="off">
+    <input type="text" id="quickNums" placeholder="e.g. 412, 433, 501-505" aria-label="Card numbers to add" enterkeyhint="done">
+    <button class="btn gold" type="submit">Add to binder</button>
+  </form>
+  <div class="quick-out" id="quickOut" role="status"></div>
+  <p class="quick-foot"><button class="linkish" id="quickBrowse" type="button">Or browse the cards still needed</button></p>
+</dialog>
 <dialog id="shelf" aria-labelledby="shelfTitle">
   <button class="d-close" id="shelfClose" type="button" aria-label="Close">×</button>
   <h2 id="shelfTitle">Your Heritage binders</h2>
@@ -386,7 +409,7 @@ dialog::backdrop{background:rgba(5,9,7,.72)}
 <script>
 /* ===== binders: one per Topps Heritage set. Each set that is set up lives in its own file under sets/ ===== */
 const YEARS=Array.from({length:26},(_,i)=>2026-i);
-const READY={"2026": "sets/2026.js", "2025": "sets/2025.js"};           // year -> data file
+const READY={"2026": "sets/2026.js", "2025": "sets/2025.js", "2024": "sets/2024.js"};           // year -> data file
 window.HERITAGE_SETS=window.HERITAGE_SETS||{};
 let SET=null, TEAMS=[], cards=[], byN=new Map(), idxOf=new Map(), BASELINE=[], SHOT=new Map(), LANDSET=new Set();
 let BACKUP=new Set(), SHEETS=0, PAGES=[], TEAM_PAGE=0, WANT_PAGE=0, GRID_PAGE=0, TOTAL_PAGES=0, SHOTB=new Map();
@@ -427,7 +450,7 @@ const COL={
 "Texas Rangers":["#003278","#FFFFFF"],"Toronto Blue Jays":["#134A8E","#FFFFFF"],"Washington Nationals":["#AB0003","#FFFFFF"],
 "Multiple (League Leaders)":["#5A4A1F","#F3D98B"],"Rookie Quad (multiple teams)":["#3B3F46","#E2B33C"],
 "League Leaders":["#5A4A1F","#F3D98B"],"Record Breakers":["#7A1F2B","#F2C14E"],"Father & Son":["#2E4A3A","#E8D9B0"],
-"All-Time All-Stars":["#1F3B73","#D7263D"],"AL/NL Champions":["#3B3F46","#E2B33C"],"World Series Champions":["#3B3F46","#E2B33C"]
+"All-Time All-Stars":["#1F3B73","#D7263D"],"Oakland Athletics":["#003831","#EFB21E"],"Season Highlights":["#7A1F2B","#F2C14E"],"MVPs":["#1F3B73","#E2B33C"],"Postseason Highlights":["#3B3F46","#E2B33C"],"World Series Highlights":["#3B3F46","#E2B33C"],"AL/NL Champions":["#3B3F46","#E2B33C"],"World Series Champions":["#3B3F46","#E2B33C"]
 };
 const SPARK="radial-gradient(rgba(255,255,255,.95) 14%,transparent 16%) 0 0/5cqi 5cqi,";
 const FRAME={
@@ -463,7 +486,9 @@ const backLand=c=>SET.backLand!==false&&!BACKUP.has(c.n);
 const teamLabel=t=>t.startsWith("Multiple")?"League Leaders":t.startsWith("Rookie Quad")?"Rookie Quad":t;
 function mono(c){
   if(c.team.startsWith("Multiple")||c.team==="League Leaders")return "LL";
-  if(c.team==="AL/NL Champions"||c.team==="World Series Champions")return "WS";
+  if(c.team==="AL/NL Champions"||c.team==="World Series Champions"||c.team==="World Series Highlights")return "WS";
+  if(c.team==="Postseason Highlights")return "PS";
+  if(c.team==="MVPs")return "MVP";
   if(c.team.startsWith("Rookie Quad"))return "RC";
   const w=c.name.replace(/\b(Jr|Sr|II|III)\.?$/,"").trim().split(/\s+/);
   return (w[0][0]+(w.length>1?w[w.length-1][0]:"")).toUpperCase();
@@ -726,7 +751,50 @@ $("prev").onclick=()=>step(-1); $("next").onclick=()=>step(1);
 $("edgePrev").onclick=e=>{e.stopPropagation();step(-1)}; $("edgeNext").onclick=e=>{e.stopPropagation();step(1)};
 $("scrub").addEventListener("change",e=>go(single?SEQ[+e.target.value]:e.target.value*2));
 $("jumps").addEventListener("click",e=>{const b=e.target.closest("[data-jump]");if(b)go(+b.dataset.jump)});
-$("toAdd").onclick=()=>go(WANT_PAGE);
+$("toAdd").onclick=()=>{if(!canEdit){go(WANT_PAGE);return}$("quickOut").innerHTML="";$("quick").showModal();setTimeout(()=>$("quickNums").focus(),40)};
+$("quickClose").onclick=()=>$("quick").close();
+$("quick").addEventListener("click",e=>{if(e.target===$("quick"))$("quick").close()});
+$("quickBrowse").onclick=()=>{$("quick").close();go(WANT_PAGE)};
+/* "412, 433 501-505" -> numbers, in the order typed, without repeats */
+function parseNums(text){
+  const out=[], bad=[];
+  for(const tok of String(text).split(/[\s,;]+/).filter(Boolean)){
+    const m=/^#?(\d{1,4})(?:\s*[-–]\s*#?(\d{1,4}))?$/.exec(tok);
+    if(!m){bad.push(tok);continue}
+    let a=+m[1], b=m[2]?+m[2]:a; if(b<a)[a,b]=[b,a];
+    if(b-a>800){bad.push(tok);continue}
+    for(let n=a;n<=b;n++)if(!out.includes(n))out.push(n);
+  }
+  return {nums:out,bad};
+}
+$("quickForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const o=$("quickOut");
+  if(!canEdit){o.innerHTML='<p class="bad">Sign in as the owner to add cards.</p>';return}
+  const raw=$("quickNums").value.replace(/(\d)\s*[-–]\s*(\d)/g,"$1-$2"), {nums,bad}=parseNums(raw);
+  if(!nums.length&&!bad.length){o.innerHTML='<p class="meh">Type at least one card number.</p>';return}
+  const added=[], had=[], missing=[], patch={};
+  for(const n of nums){
+    if(!byN.has(n))missing.push(n);
+    else if(owned.has(n))had.push(n);
+    else{owned.add(n);patch[n]=true;added.push(n)}
+  }
+  if(added.length){persist({owned:patch});if(!busy)render()}
+  const list=a=>a.map(n=>"#"+n).join(", ");
+  let h="";
+  if(added.length)h+=`<p class="ok">Added ${added.length} card${added.length===1?"":"s"} to the ${SET.year} binder.</p><ul>${added.map(n=>`<li><b>#${n}</b> ${esc(byN.get(n).name)} · sheet ${sheetOf(n)+1}</li>`).join("")}</ul>`;
+  if(had.length)h+=`<p class="meh">Already in the binder: ${list(had)}</p>`;
+  if(missing.length)h+=`<p class="bad">Not in the ${SET.year} set: ${list(missing)}</p>`;
+  if(bad.length)h+=`<p class="bad">Couldn't read: ${bad.map(esc).join(", ")}</p>`;
+  o.innerHTML=h;
+  if(added.length){
+    $("quickNums").value="";
+    const undo=()=>{const p={};for(const n of added){owned.delete(n);p[n]=false}persist({owned:p});if(!busy)render();$("quickOut").innerHTML='<p class="meh">Undone. Those cards are out of the binder again.</p>'};
+    o.insertAdjacentHTML("beforeend",'<p><button class="linkish" type="button" id="quickUndo">Undo</button></p>');
+    $("quickUndo").onclick=undo;
+    toast(`Added ${added.length} card${added.length===1?"":"s"}.`,[["Undo",undo]]);
+  }
+});
 document.addEventListener("keydown",e=>{
   if($("dlg").open||/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))return;
   if(e.key==="ArrowRight")step(1); else if(e.key==="ArrowLeft")step(-1);
