@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Move binder data</title>
+<style>
+  body{font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;max-width:560px;margin:40px auto;padding:0 18px;color:#222;background:#faf7f0}
+  h1{font-size:1.4rem;margin:0 0 .3em}
+  p{margin:.4em 0 1em;color:#555}
+  input,button{font:inherit;padding:10px 14px;border-radius:8px;border:1px solid #bbb}
+  input{width:100%;box-sizing:border-box;margin-bottom:10px}
+  button{background:#1d3557;color:#fff;border-color:#1d3557;cursor:pointer}
+  button:disabled{opacity:.5;cursor:default}
+  #log{margin-top:18px;white-space:pre-wrap;font:13px/1.5 ui-monospace,Menlo,monospace;background:#fff;border:1px solid #ddd;border-radius:8px;padding:12px;min-height:3em}
+  a{color:#1d3557}
+</style>
+</head>
+<body>
+<h1>Move binder data from the old site</h1>
+<p>Copies every binder's owned cards, prices, rotations and uploaded photos from toppsheritage.netlify.app into this site. It's safe to run more than once. Nothing on the old site is changed.</p>
+<form id="f">
+  <input id="pw" type="password" placeholder="Owner password" autocomplete="current-password" required>
+  <button id="go">Sign in and copy everything</button>
+</form>
+<div id="log">Waiting…</div>
+<p style="margin-top:14px"><a href="/">Back to the binders</a></p>
+<script>
+const log = (s) => { const el = document.getElementById("log"); el.textContent = (el.textContent === "Waiting…" ? "" : el.textContent + "\n") + s; };
+document.getElementById("f").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById("go"); btn.disabled = true;
+  try {
+    const lr = await fetch("/api/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: document.getElementById("pw").value }) });
+    const lj = await lr.json().catch(() => ({}));
+    if (!lr.ok) throw new Error(lj.error || "sign-in failed");
+    const token = lj.token;
+    try { localStorage.setItem("heritage-owner-token", token); } catch (_) {}
+    const auth = { Authorization: "Bearer " + token };
+    log("Signed in. Copying binder records…");
+    const dr = await fetch("/api/migrate?step=docs", { method: "POST", headers: auth });
+    const dj = await dr.json();
+    if (!dr.ok) throw new Error(dj.error || "copy failed");
+    let problems = 0;
+    for (const r of dj.report) {
+      if (r.error) problems++;
+      const year = r.key === "binder/collection" ? "2026" : r.key.slice(-4);
+      log(year + ": " + (r.error || r.skipped || `${r.owned} owned, ${r.prices} prices, ${r.photos} photos`));
+    }
+    let ids = dj.photoIds, copied = 0, failed = [];
+    log(`Copying ${ids.length} uploaded photos…`);
+    while (ids.length) {
+      const batch = ids.slice(0, 40); ids = ids.slice(40);
+      const pr = await fetch("/api/migrate?step=photos", { method: "POST", headers: Object.assign({ "Content-Type": "application/json" }, auth), body: JSON.stringify({ ids: batch }) });
+      const pj = await pr.json();
+      if (!pr.ok) throw new Error(pj.error || "photo copy failed");
+      copied += pj.done.length; failed = failed.concat(pj.failed);
+      log(`  ${copied} copied so far`);
+    }
+    if (problems || failed.length) log(`Finished with problems: ${problems} binders and ${failed.length} photos didn't copy. Try again in a minute.`);
+    else log("All done. Open the binders to check.");
+  } catch (err) {
+    log("Stopped: " + err.message);
+  } finally { btn.disabled = false; }
+});
+</script>
+</body>
+</html>

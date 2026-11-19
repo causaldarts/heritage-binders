@@ -25,3 +25,15 @@ copy, and from then on the stored copy is what everyone sees.
 ## Adding a year
 Add `site/sets/<year>.js` and its photo sheets, then add the year to `READY` in
 `site/index.html`.
+
+## Hosting on Cloudflare Pages (current)
+
+The site also runs on Cloudflare Pages, which has no deploy credits.
+
+- **Build settings:** framework preset *None*, build command empty, build output directory `site`.
+- **Server code:** `functions/` (Cloudflare Pages Functions). The old Netlify versions in `netlify/` are kept until the move is finished.
+- **Bindings** (Settings → Bindings):
+  - D1 database bound as `DB` (binder records: owned cards, prices, rotations, photo links)
+  - KV namespace bound as `PHOTOS` (photos uploaded from the site)
+- **Variables and secrets:** `ADMIN_PASSWORD` (type *Secret*).
+- **Moving data from Netlify:** open `/move` on the new site, enter the password, and it copies every binder and uploaded photo across. Safe to repeat.
