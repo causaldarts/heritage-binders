@@ -324,6 +324,86 @@ dialog::backdrop{background:rgba(5,9,7,.72)}
   .jumps{flex-wrap:nowrap}.jumps .btn{padding:4px 8px;font-size:.78rem}
   .toast{bottom:56px}
 }
+/* ---------- views: binder, all cards, dashboard, vault ---------- */
+.views{display:flex;gap:6px;padding:0 20px 6px;overflow-x:auto;scrollbar-width:none;flex:none}
+.views::-webkit-scrollbar{display:none}
+.vtab{flex:none;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.16);border-radius:20px;padding:5px 14px;font:600 .88rem var(--cond);letter-spacing:.07em;text-transform:uppercase;cursor:pointer;color:var(--muted);transition:background .15s,color .15s,border-color .15s}
+.vtab:hover{color:var(--ink);border-color:rgba(255,255,255,.3)}
+.vtab[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:#221a04}
+body.panel-on .stage,body.panel-on .nav{display:none}
+.panel{flex:1;min-height:0;overflow-y:auto;padding:6px 20px 40px;animation:pvIn .25s ease}
+.panel>*{max-width:1180px;margin-left:auto;margin-right:auto}
+@keyframes pvIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.pv-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:8px 18px;margin:6px auto 12px}
+.pv-head h2{margin:0;font:700 clamp(1.5rem,3.2vw,2.1rem)/1.1 var(--display)}
+.pv-head p{margin:2px 0 0;color:var(--muted)}
+.pv-tools{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:14px}
+.pv-tools input{flex:1 1 200px;max-width:340px;background:#0d0f12;border:1px solid #333a36;border-radius:7px;color:var(--ink);font:400 15px var(--body);padding:7px 10px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:14px 12px}
+.tile{position:relative;content-visibility:auto;contain-intrinsic-size:auto 170px}
+.tile .pocket{transition:transform .18s}
+.tile:hover .pocket{transform:translateY(-3px)}
+.tile .badge{position:absolute;z-index:2;top:-6px;right:-6px;background:var(--gold);color:#221a04;font:700 12px/1 var(--cond);padding:4px 6px;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,.4);pointer-events:none}
+.tile .star{position:absolute;z-index:2;top:-7px;left:-5px;color:var(--gold);font-size:18px;text-shadow:0 1px 3px #000;pointer-events:none}
+.pv-empty{color:var(--muted);padding:30px 0;text-align:center}
+.pv-sec{margin:26px auto 12px;font:700 1.15rem var(--display);display:flex;align-items:baseline;gap:10px}
+.pv-sec small{font:500 .85rem var(--body);color:var(--muted)}
+/* dashboard */
+.dash{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.dcard{background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:16px 18px}
+.dcard h3{margin:0 0 10px;font:600 .85rem var(--cond);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.ringbox{display:flex;align-items:center;gap:18px}
+.ring{--p:0;flex:none;width:118px;aspect-ratio:1;border-radius:50%;background:conic-gradient(var(--gold) calc(var(--p)*1%),rgba(255,255,255,.09) 0);display:grid;place-items:center;transition:--p .6s}
+.ring b{width:84%;aspect-ratio:1;border-radius:50%;background:#1a2620;display:grid;place-items:center;font:700 1.7rem var(--display)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;flex:1}
+.stat b{display:block;font:700 1.45rem/1.1 var(--display)}
+.stat span{font-size:.85rem;color:var(--muted)}
+.miles{display:flex;gap:8px;flex-wrap:wrap}
+.mile{flex:1 1 0;min-width:0;text-align:center;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px 2px;color:var(--muted)}
+.mile b{display:block;font:700 clamp(.9rem,1.6vw,1.15rem) var(--display)}
+.mile span{font-size:.75rem}
+.mile.on{border-color:var(--gold);color:#221a04;background:var(--gold)}
+.mile.on span{color:#3b2e08}
+.d-next{margin:12px 0 0;color:var(--muted)}
+.bars .row{display:grid;grid-template-columns:88px 1fr 64px;gap:10px;align-items:center;margin:7px 0;font-size:.92rem}
+.bars .row span:last-child{text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+.bars .tb{height:8px;border-radius:4px;background:rgba(255,255,255,.09);overflow:hidden}
+.bars .tb i{display:block;height:100%;background:var(--gold);border-radius:4px}
+.acts{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.want-acts{flex:none;display:flex;gap:6px;flex-wrap:wrap;margin:-1cqi 0 2cqi}
+/* vault */
+.vxgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.vx{border:0;padding:0;background:#0d0f12;border-radius:10px;overflow:hidden;cursor:pointer;text-align:left;box-shadow:0 6px 18px rgba(0,0,0,.4);transition:transform .18s,box-shadow .18s;display:flex;flex-direction:column}
+.vx:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(0,0,0,.5)}
+.vx img{width:100%;aspect-ratio:5/7;object-fit:cover;display:block;background:#111}
+.vx-cap{padding:8px 10px 10px;display:flex;flex-direction:column;gap:2px}
+.vx-cap b{font:600 .95rem/1.2 var(--body)}
+.vx-cap i{font:600 .72rem var(--cond);letter-spacing:.08em;text-transform:uppercase;font-style:normal;color:var(--gold)}
+.v-form{display:grid;gap:10px;margin-top:12px}
+.v-form label{display:grid;gap:4px;font-size:.9rem;color:var(--muted)}
+.v-form input,.v-form select{background:#0d0f12;border:1px solid #333a36;border-radius:7px;color:var(--ink);font:400 15px var(--body);padding:8px 10px}
+.v-pick{display:flex;gap:10px;align-items:center}
+.v-pick img{width:70px;aspect-ratio:5/7;object-fit:cover;border-radius:6px;background:#111}
+.v-big{display:block;max-width:100%;max-height:62vh;margin:0 auto 12px;border-radius:10px}
+.d-qty{display:flex;align-items:center;gap:10px;margin:10px 0}
+.d-qty .btn{padding:3px 12px;font-size:1.05rem}
+.d-qty b{font:700 1.2rem var(--display);min-width:1.4em;text-align:center}
+.d-qty i{color:var(--muted);font-size:.9rem}
+#printArea{display:none}
+@media (max-width:760px){.views{padding:0 16px 5px;gap:5px}.vtab{flex:1 1 0;padding:5px 2px;font-size:.78rem;letter-spacing:.03em;text-align:center;white-space:nowrap}.panel{padding:4px 14px 34px}.tiles{grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:12px 10px}.vxgrid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}.ring{width:96px}}
+@media (orientation:landscape) and (max-height:560px){.views{padding:0 14px 3px}.vtab{padding:3px 11px;font-size:.78rem}}
+@media print{
+  html,body{height:auto!important;overflow:visible!important;background:#fff!important;color:#000!important;display:block!important}
+  body.printing>*{display:none!important}
+  body.printing #printArea{display:block!important;font:11pt/1.35 Georgia,serif;color:#000}
+  #printArea h1{font-size:18pt;margin:0 0 2pt}
+  #printArea p{margin:0 0 10pt;font-size:10pt}
+  #printArea ol{columns:2;column-gap:24pt;list-style:none;padding:0;margin:0}
+  #printArea li{break-inside:avoid;padding:2pt 0;border-bottom:1px solid #ddd;display:flex;gap:6pt}
+  #printArea li .bx{width:9pt;height:9pt;border:1px solid #000;flex:none;margin-top:2pt}
+  #printArea li b{min-width:28pt}
+}
+@media (prefers-reduced-motion:reduce){.panel{animation:none}.tile .pocket,.vx{transition:none}}
 @media (prefers-reduced-motion:reduce){.leaf,.leaf .face::after{animation-duration:.38s !important}.card{transition:none}.bar i{transition:none}}
 </style>
 </head>
@@ -344,6 +424,12 @@ dialog::backdrop{background:rgba(5,9,7,.72)}
     <button class="btn gold" id="toAdd" type="button">Add cards</button>
   </div>
 </header>
+<nav class="views" id="views" aria-label="Views">
+  <button type="button" class="vtab" data-view="binder" aria-pressed="true">Binder</button>
+  <button type="button" class="vtab" data-view="grid" aria-pressed="false">All cards</button>
+  <button type="button" class="vtab" data-view="stats" aria-pressed="false">Dashboard</button>
+  <button type="button" class="vtab" data-view="vault" aria-pressed="false">Vault</button>
+</nav>
 
 <main class="stage" id="stage">
   <div class="binder" id="binder">
@@ -363,6 +449,8 @@ dialog::backdrop{background:rgba(5,9,7,.72)}
   <button class="btn turn" id="next" type="button" aria-label="Next page">›</button>
   <div class="jumps" id="jumps"></div>
 </footer>
+
+<main class="panel" id="panel" hidden></main>
 
 <dialog id="dlg" aria-labelledby="dTitle">
   <button class="d-close" id="dClose" type="button" aria-label="Close">×</button>
@@ -408,6 +496,12 @@ dialog::backdrop{background:rgba(5,9,7,.72)}
   </div>
 </dialog>
 
+<dialog id="vaultDlg" aria-labelledby="vTitle">
+  <button class="d-close" id="vaultClose" type="button" aria-label="Close">×</button>
+  <div id="vaultBody"></div>
+  <input type="file" id="vaultFile" accept="image/*" hidden>
+</dialog>
+<div id="printArea" hidden></div>
 <div class="toast" id="toast" role="status" hidden></div>
 
 <script src="site-config.js"></script>
@@ -470,13 +564,14 @@ const HOSTED=!!(window.claude&&typeof window.claude.use==="function");   // insi
 /* stand-alone website with a shared online record (see cloud-config.js): everyone reads it, only the owner writes */
 const CLOUD=(!HOSTED&&window.HERITAGE_SITE)?window.HERITAGE_SITE:null;   // the hosted website: saved on the server, only the owner can change it
 let canEdit=!CLOUD, fbUser=null;
-let owned=new Set(), photos={}, rot={}, price={};   // price: the owner's own buy prices, which win over the set's estimates
+let owned=new Set(), photos={}, rot={}, price={}, qty={}, fav={}, vx={};   // qty: copies owned (2+), fav: favourites, vx: vault showcase items   // price: the owner's own buy prices, which win over the set's estimates
 function loadState(){
-  owned=new Set(BASELINE); photos={}; rot={}; price={};
-  try{const c=JSON.parse(localStorage.getItem(lsKey(SET.year))||"null");if(c&&Array.isArray(c.owned)){owned=new Set(c.owned);photos=c.photos||{};rot=c.rot||{};price=c.price||{}}}catch(e){}
+  owned=new Set(BASELINE); photos={}; rot={}; price={}; qty={}; fav={}; vx={};
+  try{const c=JSON.parse(localStorage.getItem(lsKey(SET.year))||"null");if(c&&Array.isArray(c.owned)){owned=new Set(c.owned);photos=c.photos||{};rot=c.rot||{};price=c.price||{};qty=c.qty||{};fav=c.fav||{};vx=c.vx||{}}}catch(e){}
 }
-function saveLocal(){try{localStorage.setItem(lsKey(SET.year),JSON.stringify({owned:[...owned],photos,rot,price}))}catch(e){}}
-function stateKey(){return [...owned].sort((a,b)=>a-b).join(",")+"|"+JSON.stringify(Object.keys(photos).sort().map(k=>[k,photos[k]]))+JSON.stringify(Object.keys(rot).sort().map(k=>[k,rot[k]]))+JSON.stringify(Object.keys(price).sort().map(k=>[k,price[k]]))}
+function saveLocal(){try{localStorage.setItem(lsKey(SET.year),JSON.stringify({owned:[...owned],photos,rot,price,qty,fav,vx}))}catch(e){}}
+const sortedJSON=o=>JSON.stringify(Object.keys(o).sort().map(k=>[k,o[k]]));
+function stateKey(){return [...owned].sort((a,b)=>a-b).join(",")+"|"+[photos,rot,price,qty,fav,vx].map(sortedJSON).join("")}
 
 let cur=0, busy=false, wantQ="", wantF="all", wantScroll=0;
 const mq=window.matchMedia("(orientation:portrait) and (max-width:760px), (max-aspect-ratio:1/1), (orientation:landscape) and (max-height:560px)");
@@ -586,6 +681,7 @@ function wantHTML(){
   const t=priceTotals();
   return `<div class="bp-head"><h2>Cards to add <span id="wantCount">(${need})</span></h2><p>${canEdit?"Bought one? Press Add and it goes into its pocket.":"The cards this binder is still missing."}${t&&need?` About <b>${money(t.need)}</b> to finish at current buy prices.`:""}</p></div>
   <div class="want-tools"><input type="search" id="wantSearch" placeholder="Search number, player or team" value="${esc(wantQ)}" aria-label="Search missing cards">${chip("all","All")}${chip("base","Base")}${chip("sp","SP")}</div>
+  ${need?`<div class="want-acts"><button type="button" class="chip" data-wa="copy">Copy numbers</button><button type="button" class="chip" data-wa="csv">CSV</button><button type="button" class="chip" data-wa="print">Print</button></div>`:""}
   <ul class="want-list" id="wantList">${wantListHTML()}</ul><div class="pg-foot"><span>Back page</span><span>${need} to go</span></div>`;
 }
 function gridHTML(){
@@ -596,6 +692,7 @@ function gridHTML(){
 
 function render(){
   if(!SET)return;
+  if(view!=="binder"){renderPanel();updateChrome();return}
   const wl=$("wantList"); if(wl)wantScroll=wl.scrollTop;
   const sp=$("spread"); sp.replaceChildren();
   $("binder").classList.toggle("stacked",stacked); document.body.classList.toggle("stacked",stacked);
@@ -661,11 +758,13 @@ function setOwned(n,on,quiet){
   if(!canEdit){toast("Only this binder's owner can change it.");return}
   if(on===owned.has(n))return;
   on?owned.add(n):owned.delete(n);
-  persist({owned:{[n]:on}});
+  const patch={owned:{[n]:on}};
+  if(!on&&qty[n]){delete qty[n];patch.qty={[n]:null}}
+  persist(patch);
   if(!busy)render();
   const c=byN.get(n);
   if(quiet)return;
-  if(on)toast(`Added #${n} ${c.name} to sheet ${sheetOf(n)+1}.`,[["View",()=>go(pageOf(n))],["Undo",()=>setOwned(n,false,true)]]);
+  if(on)toast(`Added #${n} ${c.name} to sheet ${sheetOf(n)+1}.`,[["View",()=>goBinder(pageOf(n))],["Undo",()=>setOwned(n,false,true)]]);
   else toast(`Took #${n} ${c.name} out of the binder.`,[["Undo",()=>setOwned(n,true,true)]]);
 }
 let toastTimer;
@@ -688,9 +787,10 @@ function openCard(n,side){
     b+=`<button type="button" class="btn" data-act="flip">${bk?"See the front":"See the back"}</button>`;
     if(assets&&!bk)b+=`<button type="button" class="btn gold" data-act="photo">${ph?"Replace photo":SHOT.has(n)?"Use my own photo":"Add a photo of your card"}</button>`;
     if(assets&&ph&&!bk)b+=`<button type="button" class="btn" data-act="nophoto">${SHOT.has(n)?"Back to the stock photo":"Remove photo"}</button>`;
+    if(canEdit)b+=`<button type="button" class="btn" data-act="fav">${fav[n]?"★ Favorite":"☆ Add to favorites"}</button>`;
     b+=`${bk?"":`<button type="button" class="btn" data-act="turn">${isLand(c)?"Turn upright":"Turn sideways"}</button>`}<button type="button" class="btn" data-act="goto">Go to sheet ${pg}</button><button type="button" class="btn danger" data-act="remove">Take out of binder</button>`;
   }else b+=`<button type="button" class="btn gold" data-act="add">Add to binder</button><button type="button" class="btn" data-act="goto">Go to sheet ${pg}</button>`;
-  $("dInfo").innerHTML=`<h2 id="dTitle">#${c.n} ${esc(c.name)}</h2><p>${esc(teamLabel(c.team))}</p><p>${[c.sp?"Short print":"Base",c.rc?"Rookie card":"",c.par?c.par+" parallel":""].filter(Boolean).map(esc).join(" · ")}</p><p>${have?"In the binder":"Not in the binder yet"} · sheet ${pg}, pocket ${pk}${bk?(SHOTB.has(n)?" · back":" · back (stand-in, no photo yet)"):""}</p>${(p=>p==null&&!canEdit?"":`<div class="d-price"><span>Buy price <b>${p==null?"not set":money(p)}</b>${p!=null?` <i>${priceKind(n)}</i>`:""}</span>${canEdit?`<form class="d-price-form" data-pricefor="${n}"><input type="number" min="0" step="0.01" inputmode="decimal" placeholder="Your price" aria-label="Set your buy price for card ${n}" value="${typeof price[n]==="number"?price[n]:""}"><button class="btn" type="submit">Save</button>${typeof price[n]==="number"?'<button class="btn" type="button" data-act="noprice">Use estimate</button>':""}</form>`:""}</div>`)(priceOf(n))}<div class="d-btns">${b}</div>${have&&!assets&&!SHOT.has(n)?'<p class="d-note">Photo uploads are available when you open this page signed in as its owner.</p>':""}<p class="d-note" id="dMsg" role="status"></p>`;
+  $("dInfo").innerHTML=`<h2 id="dTitle">#${c.n} ${esc(c.name)}</h2><p>${esc(teamLabel(c.team))}</p><p>${[c.sp?"Short print":"Base",c.rc?"Rookie card":"",c.par?c.par+" parallel":""].filter(Boolean).map(esc).join(" · ")}</p><p>${have?"In the binder":"Not in the binder yet"} · sheet ${pg}, pocket ${pk}${bk?(SHOTB.has(n)?" · back":" · back (stand-in, no photo yet)"):""}</p>${(p=>p==null&&!canEdit?"":`<div class="d-price"><span>Buy price <b>${p==null?"not set":money(p)}</b>${p!=null?` <i>${priceKind(n)}</i>`:""}</span>${canEdit?`<form class="d-price-form" data-pricefor="${n}"><input type="number" min="0" step="0.01" inputmode="decimal" placeholder="Your price" aria-label="Set your buy price for card ${n}" value="${typeof price[n]==="number"?price[n]:""}"><button class="btn" type="submit">Save</button>${typeof price[n]==="number"?'<button class="btn" type="button" data-act="noprice">Use estimate</button>':""}</form>`:""}</div>`)(priceOf(n))}${have?(q=>`<div class="d-qty"><span>Copies</span>${canEdit?`<button type="button" class="btn" data-act="qminus"${q<=1?" disabled":""} aria-label="One fewer copy">−</button><b>${q}</b><button type="button" class="btn" data-act="qplus" aria-label="One more copy">+</button>`:`<b>${q}</b>`}${q>1?`<i>${q-1} extra${q>2?"s":""} for trading</i>`:""}${!canEdit&&fav[n]?"<i>★ Favorite</i>":""}</div>`)(qty[n]||1):""}<div class="d-btns">${b}</div>${have&&!assets&&!SHOT.has(n)?'<p class="d-note">Photo uploads are available when you open this page signed in as its owner.</p>':""}<p class="d-note" id="dMsg" role="status"></p>`;
   const d=$("dlg"); if(!d.open)d.showModal();
 }
 $("dClose").onclick=()=>$("dlg").close();
@@ -709,7 +809,9 @@ $("dlg").addEventListener("click",e=>{
   if(act==="add"){setOwned(n,true,true);openCard(n)}
   else if(act==="flip"){openCard(n,dlgSide==="b"?"f":"b")}
   else if(act==="remove"){$("dlg").close();setOwned(n,false)}
-  else if(act==="goto"){$("dlg").close();go(pageOf(n)+(dlgSide==="b"?1:0))}
+  else if(act==="goto"){$("dlg").close();goBinder(pageOf(n)+(dlgSide==="b"?1:0))}
+  else if(act==="fav"&&canEdit){if(fav[n]){delete fav[n];persist({fav:{[n]:null}})}else{fav[n]=true;persist({fav:{[n]:true}})}render();openCard(n,dlgSide)}
+  else if((act==="qplus"||act==="qminus")&&canEdit){const q=Math.max(1,Math.min(999,(qty[n]||1)+(act==="qplus"?1:-1)));if(q>1)qty[n]=q;else delete qty[n];persist({qty:{[n]:q>1?q:null}});render();openCard(n,dlgSide)}
   else if(act==="noprice"&&canEdit){delete price[n];persist({price:{[n]:null}});if(!busy)render();openCard(n,dlgSide)}
   else if(act==="turn"&&canEdit){const v=!isLand(byN.get(n));rot[n]=v;persist({rot:{[n]:v}});if(!busy)render();openCard(n)}
   else if(act==="photo"){$("photoFile").value="";$("photoFile").click()}
@@ -755,6 +857,186 @@ async function shrink(file){
   }catch(e){return file}
 }
 
+/* ===== views: binder, all cards, dashboard, vault ===== */
+const VIEWS=["binder","grid","stats","vault"];
+let view="binder", gF="all", gQ="", vF="all";
+try{const v=localStorage.getItem("heritage-view");if(VIEWS.includes(v))view=v}catch(e){}
+function setView(v){
+  if(!VIEWS.includes(v))v="binder";
+  view=v; try{localStorage.setItem("heritage-view",v)}catch(e){}
+  document.querySelectorAll("#views .vtab").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.view===v)));
+  document.body.classList.toggle("panel-on",v!=="binder");
+  $("panel").hidden=v==="binder";
+  $("panel").scrollTop=0;
+  render();
+}
+function goBinder(page){if(view!=="binder")setView("binder");go(page)}
+$("views").addEventListener("click",e=>{const b=e.target.closest("[data-view]");if(b)setView(b.dataset.view)});
+
+const extra=n=>Math.max(0,(qty[n]||1)-1);
+function renderPanel(){
+  const p=$("panel"), st=p.scrollTop;
+  p.innerHTML=view==="grid"?gridViewHTML():view==="stats"?statsHTML():vaultHTML();
+  p.scrollTop=st;
+}
+function tileHTML(c){
+  const have=owned.has(c.n), x=have?extra(c.n):0;
+  return `<div class="tile">${pocketHTML(c,false)}${x?`<span class="badge" title="${x} extra">×${x+1}</span>`:""}${have&&fav[c.n]?'<span class="star" aria-label="Favorite">★</span>':""}</div>`;
+}
+
+/* --- all cards --- */
+const G_FILTERS=[["all","All"],["have","In binder"],["need","Missing"],["sp","SP"],["rc","RC"],["dupes","Extras"],["fav","Favorites"]];
+function gridRows(){
+  const q=gQ.trim().toLowerCase();
+  return cards.filter(c=>{
+    const h=owned.has(c.n);
+    if(gF==="have"&&!h||gF==="need"&&h||gF==="sp"&&!c.sp||gF==="rc"&&!c.rc||gF==="dupes"&&!(h&&extra(c.n))||gF==="fav"&&!(h&&fav[c.n]))return false;
+    return !q||(c.n+" "+c.name+" "+c.team).toLowerCase().includes(q);
+  });
+}
+function tilesHTML(){const r=gridRows();return r.length?r.map(tileHTML).join(""):`<p class="pv-empty">No cards match.</p>`}
+function gCountText(){const r=gridRows().length;return r===cards.length?`${cards.length} cards · ${owned.size} in the binder`:`Showing ${r} of ${cards.length}`}
+function gridViewHTML(){
+  return `<div class="pv-head"><div><h2>All ${SET.year} cards</h2><p id="gCount">${gCountText()}</p></div>${gF==="need"&&cards.length>owned.size?`<div class="acts"><button type="button" class="btn" data-wa="copy">Copy numbers</button><button type="button" class="btn" data-wa="csv">CSV</button><button type="button" class="btn" data-wa="print">Print</button></div>`:""}</div>
+  <div class="pv-tools"><input type="search" id="gSearch" placeholder="Search number, player or team" value="${esc(gQ)}" aria-label="Search cards">${G_FILTERS.map(([k,t])=>`<button type="button" class="chip" data-gf="${k}" aria-pressed="${gF===k}">${t}</button>`).join("")}</div>
+  <div class="tiles" id="tiles">${tilesHTML()}</div>`;
+}
+
+/* --- dashboard --- */
+function statsHTML(){
+  const tot=cards.length, have=owned.size, need=tot-have, pct=tot?100*have/tot:0;
+  let dupes=0, dupeCards=0; for(const n of owned){const x=extra(n);if(x){dupes+=x;dupeCards++}}
+  const sp=cards.filter(c=>c.sp), base=cards.filter(c=>!c.sp), rc=cards.filter(c=>c.rc);
+  const h=a=>a.filter(c=>owned.has(c.n)).length;
+  let fullSheets=0; for(let k=0;k<SHEETS;k++){const s=cards.slice(k*9,k*9+9);if(s.every(c=>owned.has(c.n)))fullSheets++}
+  const shots=Object.keys(photos).filter(k=>owned.has(+k)).length, t=priceTotals();
+  const M=[25,50,75,90,100].map(m=>({m,at:Math.ceil(tot*m/100)}));
+  const next=M.find(x=>have<x.at);
+  const bar=(label,a)=>{const hv=h(a);return a.length?`<div class="row"><span>${label}</span><div class="tb"><i style="width:${100*hv/a.length}%"></i></div><span>${hv}/${a.length}</span></div>`:""};
+  return `<div class="pv-head"><div><h2>${SET.year} dashboard</h2><p>${SET.year} Topps Heritage · ${tot} cards in the ${SET.year-49} style</p></div></div>
+  <div class="dash">
+    <section class="dcard"><h3>Completion</h3><div class="ringbox"><div class="ring" style="--p:${pct.toFixed(1)}"><b>${pct<10&&pct>0?pct.toFixed(1):Math.floor(pct)}%</b></div>
+      <div class="stats"><div class="stat"><b>${have}</b><span>owned</span></div><div class="stat"><b>${need}</b><span>missing</span></div><div class="stat"><b>${dupes}</b><span title="${dupeCards} card${dupeCards===1?"":"s"} with more than one copy">extra cop${dupes===1?"y":"ies"}</span></div><div class="stat"><b>${fullSheets}/${SHEETS}</b><span>sheets full</span></div></div></div></section>
+    <section class="dcard"><h3>Milestones</h3><div class="miles">${M.map(x=>`<div class="mile${have>=x.at?" on":""}"><b>${x.m}%</b><span>${have>=x.at?"Reached":x.at+" cards"}</span></div>`).join("")}</div>
+      <p class="d-next">${next?`<b>${next.at-have}</b> more card${next.at-have===1?"":"s"} to reach ${next.m}%.`:"Set complete. Every pocket is filled."}</p></section>
+    <section class="dcard bars"><h3>Breakdown</h3>${bar("Base",base)}${bar("Short prints",sp)}${bar("Rookies",rc)}<div class="row"><span>Your photos</span><div class="tb"><i style="width:${have?100*shots/have:0}%"></i></div><span>${shots}/${have}</span></div>
+      <div class="acts"><button type="button" class="btn" data-go="teams">Team progress</button></div></section>
+    <section class="dcard"><h3>Want list</h3><div class="stats"><div class="stat"><b>${need}</b><span>cards to find</span></div>${t?`<div class="stat"><b>${money(t.need)}</b><span>about, to finish</span></div>`:""}<div class="stat"><b>${need-cards.filter(c=>c.sp&&!owned.has(c.n)).length}</b><span>base missing</span></div><div class="stat"><b>${sp.length-h(sp)}</b><span>SPs missing</span></div></div>
+      ${need?`<div class="acts"><button type="button" class="btn gold" data-go="missing">Show missing</button><button type="button" class="btn" data-wa="copy">Copy numbers</button><button type="button" class="btn" data-wa="csv">CSV</button><button type="button" class="btn" data-wa="print">Print</button></div>`:""}</section>
+    ${t?`<section class="dcard"><h3>Value at buy prices</h3><div class="stats"><div class="stat"><b>${money(t.have)}</b><span>in the binder</span></div><div class="stat"><b>${money(t.have+t.need)}</b><span>full set</span></div></div></section>`:""}
+  </div>`;
+}
+
+/* --- want list: copy, CSV, print --- */
+function missingCards(){return cards.filter(c=>!owned.has(c.n))}
+function ranges(ns){
+  const out=[]; let a=null,b=null;
+  for(const n of ns){if(a!==null&&n===b+1){b=n;continue} if(a!==null)out.push(a===b?a:a+"-"+b); a=b=n}
+  if(a!==null)out.push(a===b?a:a+"-"+b);
+  return out.join(", ");
+}
+async function copyText(t){
+  try{await navigator.clipboard.writeText(t);return true}catch(e){}
+  try{const a=document.createElement("textarea");a.value=t;a.style.position="fixed";a.style.opacity="0";document.body.append(a);a.select();const ok=document.execCommand("copy");a.remove();return ok}catch(e){return false}
+}
+function download(name,text,type){
+  const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([text],{type}));
+  a.download=name; document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+}
+async function wantAction(kind){
+  const m=missingCards(); if(!m.length){toast("Nothing is missing. The set is complete.");return}
+  if(kind==="copy"){
+    const t=ranges(m.map(c=>c.n).sort((a,b)=>a-b));
+    toast(await copyText(t)?`Copied ${m.length} missing numbers.`:"Your browser blocked copying. Here they are: "+t.slice(0,200));
+  }else if(kind==="csv"){
+    const q=v=>/[",\n]/.test(v)?'"'+String(v).replace(/"/g,'""')+'"':String(v);
+    const rows=[["Number","Player","Team","Type","Buy price"],...m.map(c=>[c.n,c.name,teamLabel(c.team),[c.sp?"SP":"",c.rc?"RC":""].filter(Boolean).join(" "),priceOf(c.n)==null?"":priceOf(c.n).toFixed(2)])];
+    download(`${SET.year}-heritage-want-list.csv`,rows.map(r=>r.map(q).join(",")).join("\n"),"text/csv");
+    toast(`Downloaded the want list (${m.length} cards).`);
+  }else if(kind==="print"){
+    const t=priceTotals();
+    $("printArea").innerHTML=`<h1>${SET.year} Topps Heritage want list</h1><p>${m.length} of ${cards.length} cards still needed${t?` · about ${money(t.need)} at buy prices`:""} · ${new Date().toLocaleDateString()}</p><ol>${m.map(c=>`<li><span class="bx"></span><b>#${c.n}</b><span>${esc(c.name)}${c.sp?" (SP)":""}${c.rc?" RC":""} · ${esc(teamLabel(c.team))}</span></li>`).join("")}</ol>`;
+    document.body.classList.add("printing");
+    const done=()=>{document.body.classList.remove("printing");window.removeEventListener("afterprint",done)};
+    window.addEventListener("afterprint",done); setTimeout(()=>{window.print();setTimeout(done,1500)},30);
+  }
+}
+
+/* --- vault --- */
+const VKINDS=[["auto","Autograph"],["relic","Relic"],["graded","Graded"],["insert","Insert / parallel"],["other","Other"]];
+const vkLabel=k=>(VKINDS.find(x=>x[0]===k)||VKINDS[4])[1];
+const V_FILTERS=[["all","All"],["auto","Autos"],["relic","Relics"],["more","Graded & more"],["fav","Favorites"],["photos","Card photos"]];
+function vaultItems(){
+  return Object.keys(vx).map(Number).sort((a,b)=>b-a).map(id=>({id,...vx[id]}))
+    .filter(v=>vF==="all"||(vF==="more"?!["auto","relic"].includes(v.k):v.k===vF));
+}
+function vaultHTML(){
+  const items=["all","auto","relic","more"].includes(vF)?vaultItems():[];
+  const favs=["all","fav"].includes(vF)?cards.filter(c=>owned.has(c.n)&&fav[c.n]):[];
+  const shots=["all","photos"].includes(vF)?cards.filter(c=>owned.has(c.n)&&photos[c.n]):[];
+  const sec=(title,count,body,empty)=>`<h3 class="pv-sec">${title}<small>${count}</small></h3>${body||`<p class="pv-empty">${empty}</p>`}`;
+  let h=`<div class="pv-head"><div><h2>${SET.year} vault</h2><p>Your autos, relics, favorites and photos of your own cards.</p></div>${canEdit&&assets?'<button type="button" class="btn gold" data-vadd="1">Add to vault</button>':""}</div>
+  <div class="pv-tools">${V_FILTERS.map(([k,t])=>`<button type="button" class="chip" data-vf="${k}" aria-pressed="${vF===k}">${t}</button>`).join("")}</div>`;
+  if(["all","auto","relic","more"].includes(vF))h+=sec("Showcase",items.length,items.length?`<div class="vxgrid">${items.map(v=>`<button type="button" class="vx" data-vx="${v.id}"><img src="/_blob/${encodeURIComponent(v.p)}" alt="" loading="lazy"><span class="vx-cap"><i>${esc(vkLabel(v.k))}</i><b>${esc(v.t||"Untitled")}</b></span></button>`).join("")}</div>`:"",canEdit&&assets?"Nothing here yet. Press Add to vault to show off an auto, relic or graded card from this set.":"No showcase cards yet.");
+  if(["all","fav"].includes(vF))h+=sec("Favorites",favs.length,favs.length?`<div class="tiles">${favs.map(tileHTML).join("")}</div>`:"",canEdit?"Open any card in the binder and press ☆ Add to favorites.":"No favorites picked yet.");
+  if(["all","photos"].includes(vF))h+=sec("Photos of my cards",shots.length,shots.length?`<div class="tiles">${shots.map(tileHTML).join("")}</div>`:"",canEdit?"Open a card and press Add a photo of your card, or use Add photos at the top.":"No photos of the owner's own cards yet.");
+  return h;
+}
+let vPending=null;   // the photo picked for a new vault item
+function openVaultAdd(){
+  vPending=null;
+  $("vaultBody").innerHTML=`<h2 id="vTitle">Add to the ${SET.year} vault</h2><p class="d-note">A photo of an autograph, relic, graded slab or other card from this set.</p>
+  <form class="v-form" id="vForm"><div class="v-pick"><img id="vPrev" alt="" hidden><button type="button" class="btn" id="vPick">Choose photo</button></div>
+  <label>Title<input id="vT" maxlength="80" placeholder="e.g. Real One Auto, Bobby Witt Jr." required></label>
+  <label>Type<select id="vK">${VKINDS.map(([k,t])=>`<option value="${k}">${t}</option>`).join("")}</select></label>
+  <div class="d-btns"><button type="submit" class="btn gold" id="vSave">Save to vault</button></div><p class="d-note" id="vMsg" role="status"></p></form>`;
+  $("vaultDlg").showModal();
+}
+function openVaultItem(id){
+  const v=vx[id]; if(!v)return;
+  $("vaultBody").innerHTML=`<img class="v-big" src="/_blob/${encodeURIComponent(v.p)}" alt="${esc(v.t)}"><h2 id="vTitle">${esc(v.t||"Untitled")}</h2><p class="d-note">${esc(vkLabel(v.k))} · ${SET.year} Topps Heritage</p>${canEdit?`<div class="d-btns"><button type="button" class="btn danger" data-vdel="${id}">Remove from vault</button></div>`:""}`;
+  $("vaultDlg").showModal();
+}
+$("vaultClose").onclick=()=>$("vaultDlg").close();
+$("vaultDlg").addEventListener("click",e=>{
+  if(e.target===$("vaultDlg")){$("vaultDlg").close();return}
+  if(e.target.closest("#vPick")){$("vaultFile").value="";$("vaultFile").click();return}
+  const d=e.target.closest("[data-vdel]");
+  if(d&&canEdit){const id=d.dataset.vdel, v=vx[id];delete vx[id];persist({vx:{[id]:null}});if(v&&assets)assets.delete(v.p).catch(()=>{});$("vaultDlg").close();render();toast("Removed from the vault.")}
+});
+$("vaultFile").addEventListener("change",async e=>{
+  const f=e.target.files&&e.target.files[0]; if(!f)return;
+  vPending=await shrink(f); const pv=$("vPrev"); if(pv){pv.src=URL.createObjectURL(vPending);pv.hidden=false}
+});
+$("vaultDlg").addEventListener("submit",async e=>{
+  e.preventDefault(); if(!canEdit||!assets)return;
+  const msg=$("vMsg"), title=$("vT").value.trim().slice(0,80), kind=$("vK").value;
+  if(!vPending){msg.textContent="Choose a photo first.";return}
+  msg.textContent="Uploading…"; $("vSave").disabled=true;
+  try{
+    const r=await assets.upload(vPending), id=Math.max(0,...Object.keys(vx).map(Number))+1;
+    if(id>9999)throw new Error("full");
+    vx[id]={p:r.id,t:title,k:kind}; persist({vx:{[id]:vx[id]}});
+    $("vaultDlg").close(); vF=["auto","relic"].includes(kind)?kind:"more"; render(); toast("Added to the vault.");
+  }catch(err){msg.textContent="That photo could not be uploaded. Try a JPG or PNG.";$("vSave").disabled=false}
+});
+
+/* --- panel events --- */
+$("panel").addEventListener("click",e=>{
+  let el;
+  if((el=e.target.closest("[data-gf]"))){gF=el.dataset.gf;render()}
+  else if((el=e.target.closest("[data-vf]"))){vF=el.dataset.vf;render()}
+  else if((el=e.target.closest("[data-wa]")))wantAction(el.dataset.wa);
+  else if((el=e.target.closest("[data-go]"))){if(el.dataset.go==="teams")goBinder(TEAM_PAGE);else{gF="need";gQ="";setView("grid")}}
+  else if(e.target.closest("[data-vadd]"))openVaultAdd();
+  else if((el=e.target.closest("[data-vx]")))openVaultItem(el.dataset.vx);
+  else if((el=e.target.closest("[data-card]")))openCard(+el.dataset.card,el.dataset.side);
+});
+$("panel").addEventListener("input",e=>{
+  if(e.target.id!=="gSearch")return;
+  gQ=e.target.value; $("tiles").innerHTML=tilesHTML(); $("gCount").textContent=gCountText();
+});
+
 /* ===== events ===== */
 $("spread").addEventListener("click",e=>{
   if(busy)return;
@@ -762,6 +1044,7 @@ $("spread").addEventListener("click",e=>{
   if((el=e.target.closest("[data-add]")))setOwned(+el.dataset.add,true);
   else if((el=e.target.closest("[data-num]"))){const n=+el.dataset.num;owned.has(n)||!canEdit?openCard(n):setOwned(n,true)}
   else if((el=e.target.closest("[data-wf]"))){wantF=el.dataset.wf;wantScroll=0;render()}
+  else if((el=e.target.closest("[data-wa]")))wantAction(el.dataset.wa);
   else if((el=e.target.closest("[data-card]")))openCard(+el.dataset.card,el.dataset.side);
 });
 $("spread").addEventListener("input",e=>{
@@ -772,10 +1055,10 @@ $("prev").onclick=()=>step(-1); $("next").onclick=()=>step(1);
 $("edgePrev").onclick=e=>{e.stopPropagation();step(-1)}; $("edgeNext").onclick=e=>{e.stopPropagation();step(1)};
 $("scrub").addEventListener("change",e=>go(single?SEQ[+e.target.value]:e.target.value*2));
 $("jumps").addEventListener("click",e=>{const b=e.target.closest("[data-jump]");if(b)go(+b.dataset.jump)});
-$("toAdd").onclick=()=>{if(!canEdit){go(WANT_PAGE);return}$("quickOut").innerHTML="";$("quick").showModal();setTimeout(()=>$("quickNums").focus(),40)};
+$("toAdd").onclick=()=>{if(!canEdit){goBinder(WANT_PAGE);return}$("quickOut").innerHTML="";$("quick").showModal();setTimeout(()=>$("quickNums").focus(),40)};
 $("quickClose").onclick=()=>$("quick").close();
 $("quick").addEventListener("click",e=>{if(e.target===$("quick"))$("quick").close()});
-$("quickBrowse").onclick=()=>{$("quick").close();go(WANT_PAGE)};
+$("quickBrowse").onclick=()=>{$("quick").close();goBinder(WANT_PAGE)};
 /* "412, 433 501-505" -> numbers, in the order typed, without repeats */
 function parseNums(text){
   const out=[], bad=[];
@@ -832,7 +1115,7 @@ mq.addEventListener("change",()=>{const was=single;single=mq.matches;busy=false;
 /* ===== saving (kept with the page, one saved record per binder, so it follows you across devices) ===== */
 let db=null, assets=null, R=null, readOnly=false, chain=Promise.resolve(), pending=0, unsub=null, dbWait=null;
 function setSync(text,err){const s=$("sync");s.textContent=text;s.classList.toggle("err",!!err)}
-function fullDoc(){const o={};for(const n of owned)o[n]=true;return {owned:o,photos:{...photos},rot:{...rot},price:{...price}}}
+function fullDoc(){const o={};for(const n of owned)o[n]=true;return {owned:o,photos:{...photos},rot:{...rot},price:{...price},qty:{...qty},fav:{...fav},vx:{...vx}}}
 function persist(patch){
   saveLocal();
   const r=R; if(!r||readOnly||!canEdit)return;
@@ -859,7 +1142,10 @@ function applyRemote(d){
   const p={}; if(d&&d.photos)for(const k in d.photos)if(typeof d.photos[k]==="string")p[k]=d.photos[k];
   const r={}; if(d&&d.rot)for(const k in d.rot)if(typeof d.rot[k]==="boolean")r[k]=d.rot[k];
   const pr={}; if(d&&d.price)for(const k in d.price)if(typeof d.price[k]==="number")pr[k]=d.price[k];
-  owned=o; photos=p; rot=r; price=pr; saveLocal();
+  const q={}; if(d&&d.qty)for(const k in d.qty){const v=d.qty[k];if(Number.isInteger(v)&&v>=2)q[k]=v}
+  const fv={}; if(d&&d.fav)for(const k in d.fav)if(d.fav[k]===true)fv[k]=true;
+  const x={}; if(d&&d.vx)for(const k in d.vx){const v=d.vx[k];if(v&&typeof v==="object"&&typeof v.p==="string")x[k]={p:v.p,t:String(v.t||""),k:String(v.k||"other")}}
+  owned=o; photos=p; rot=r; price=pr; qty=q; fav=fv; vx=x; saveLocal();
   if(stateKey()!==before&&!busy)render();
 }
 function connect(){
@@ -1040,6 +1326,7 @@ window.addEventListener("hashchange",()=>{const m=/^#y(\d{4})$/.exec(location.ha
   if(m&&READY[+m[1]])y=+m[1];
   else{try{const l=+localStorage.getItem("heritage-last-binder");if(READY[l])y=l}catch(e){}}
   openSet(y);
+  if(view!=="binder")setView(view);
 })();
 
 </script>

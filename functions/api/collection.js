@@ -1,9 +1,11 @@
-// One saved record per binder: { owned: {n: true}, photos: {n: id}, rot: {n: bool}, price: {n: dollars} }.
+// One saved record per binder: { owned: {n: true}, photos: {n: id}, rot: {n: bool}, price: {n: dollars},
+//   qty: {n: copies 2+}, fav: {n: true}, vx: {id: {p: photo id, t: title, k: kind}} (vault showcase items) }.
 // Anyone can read it; only the signed-in owner can change it.
 import { isOwner, json, getDoc, putDoc, setupProblem } from "../_lib/auth.js";
 
 const KEY = /^binder\/collection(-\d{4})?$/;
-const FIELDS = ["owned", "photos", "rot", "price"];
+const FIELDS = ["owned", "photos", "rot", "price", "qty", "fav", "vx"];
+const KINDS = ["auto", "relic", "graded", "insert", "other"];
 
 export function clean(d) {
   const out = {};
@@ -15,6 +17,14 @@ export function clean(d) {
       if (!/^\d{1,4}$/.test(k)) continue;
       const v = src[k];
       if (f === "price") { if (v === null || (typeof v === "number" && isFinite(v) && v >= 0 && v <= 100000)) out[f][k] = v; continue; }
+      if (f === "qty") { if (v === null || (Number.isInteger(v) && v >= 2 && v <= 999)) out[f][k] = v; continue; }
+      if (f === "fav") { if (v === null || v === true) out[f][k] = v; continue; }
+      if (f === "vx") {
+        if (v === null) { out[f][k] = null; continue; }
+        if (v && typeof v === "object" && typeof v.p === "string" && /^[\w-]{1,80}$/.test(v.p))
+          out[f][k] = { p: v.p, t: String(v.t || "").slice(0, 80), k: KINDS.includes(v.k) ? v.k : "other" };
+        continue;
+      }
       if (v === null || typeof v === "boolean" || (typeof v === "string" && /^[\w-]{1,80}$/.test(v))) out[f][k] = v;
     }
   }
