@@ -368,6 +368,12 @@ body.panel-on .stage,body.panel-on .nav{display:none}
 .bars .row{display:grid;grid-template-columns:88px 1fr 64px;gap:10px;align-items:center;margin:7px 0;font-size:.92rem}
 .bars .row span:last-child{text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
 .bars .tb{height:8px;border-radius:4px;background:rgba(255,255,255,.09);overflow:hidden}
+.dcard.overall{grid-column:1/-1}
+.dcard.overall .ringbox{max-width:560px}
+.bars.yrs{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));column-gap:22px;margin-top:12px}
+.bars.yrs .row{grid-template-columns:44px 1fr 74px;width:100%;background:none;border:0;padding:3px 4px;color:inherit;font:inherit;text-align:left;cursor:pointer;border-radius:6px}
+.bars.yrs .row:hover,.bars.yrs .row:focus-visible{background:rgba(255,255,255,.06)}
+.bars.yrs .row[aria-current] span:first-child{font-weight:700}
 .bars .tb i{display:block;height:100%;background:var(--gold);border-radius:4px}
 .acts{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
 .want-acts{flex:none;display:flex;gap:6px;flex-wrap:wrap;margin:-1cqi 0 2cqi}
@@ -524,6 +530,7 @@ dialog h2,#shelf h2,#quick h2,.d-info h2{font-family:var(--vintage);font-weight:
 .mile.on{background:var(--green);border-color:var(--green);color:#f2ead6}
 .mile.on b{color:#fff8ec}.mile.on span{color:#d9e6dc}
 .bars .tb{background:rgba(31,42,68,.1)}
+.bars.yrs .row:hover,.bars.yrs .row:focus-visible{background:rgba(31,42,68,.07)}
 .bars .tb i{background:var(--navy)}
 .tile .badge{background:var(--mustard);color:#2a1f05}
 .tile .star{color:var(--red);text-shadow:0 1px 0 #fff8ec}
@@ -637,7 +644,8 @@ dialog h2,#shelf h2,#quick h2,.d-info h2{font-family:var(--vintage);font-weight:
 <script>
 /* ===== binders: one per Topps Heritage set. Each set that is set up lives in its own file under sets/ ===== */
 const YEARS=Array.from({length:26},(_,i)=>2026-i);
-const READY={"2026": "sets/2026.js", "2025": "sets/2025.js", "2024": "sets/2024.js", "2012": "sets/2012.js", "2013": "sets/2013.js", "2014": "sets/2014.js", "2015": "sets/2015.js", "2016": "sets/2016.js", "2017": "sets/2017.js", "2018": "sets/2018.js", "2019": "sets/2019.js", "2020": "sets/2020.js", "2021": "sets/2021.js", "2022": "sets/2022.js", "2023": "sets/2023.js"};           // year -> data file
+const READY={"2026": "sets/2026.js", "2025": "sets/2025.js", "2024": "sets/2024.js", "2012": "sets/2012.js", "2013": "sets/2013.js", "2014": "sets/2014.js", "2015": "sets/2015.js", "2016": "sets/2016.js", "2017": "sets/2017.js", "2018": "sets/2018.js", "2019": "sets/2019.js", "2020": "sets/2020.js", "2021": "sets/2021.js", "2022": "sets/2022.js", "2023": "sets/2023.js"};
+const SIZES={"2026": [400, 352], "2025": [725, 143], "2024": [725, 0], "2012": [600, 0], "2013": [600, 0], "2014": [600, 0], "2015": [725, 0], "2016": [725, 0], "2017": [725, 0], "2018": [725, 0], "2019": [725, 0], "2020": [725, 0], "2021": [725, 0], "2022": [725, 0], "2023": [725, 0]};          // year -> [cards in the set, cards owned on the built-in checklist]           // year -> data file
 window.HERITAGE_SETS=window.HERITAGE_SETS||{};
 let SET=null, TEAMS=[], cards=[], byN=new Map(), idxOf=new Map(), BASELINE=[], SHOT=new Map(), LANDSET=new Set();
 let BACKUP=new Set(), SHEETS=0, PAGES=[], TEAM_PAGE=0, WANT_PAGE=0, GRID_PAGE=0, TOTAL_PAGES=0, SHOTB=new Map();
@@ -1032,6 +1040,36 @@ function gridViewHTML(){
 }
 
 /* --- dashboard --- */
+/* --- the whole collection: every year that has at least one card --- */
+let ALL=null, allAt=0, allBusy=false;
+function localOwned(y){
+  if(SET&&SET.year===y)return owned.size;
+  try{const c=JSON.parse(localStorage.getItem(lsKey(y))||"null");if(c&&Array.isArray(c.owned))return c.owned.length}catch(e){}
+  return null;
+}
+async function refreshAll(){
+  if(allBusy||(ALL&&Date.now()-allAt<60000))return; allBusy=true;
+  let remote={};
+  try{if(CLOUD){const r=await api("summary");if(r.ok)remote=(await r.json()).counts||{}}}catch(e){}
+  ALL={}; for(const y of YEARS){if(!SIZES[y])continue;
+    const n=SET&&SET.year===y?owned.size:remote[y]!=null?remote[y]:CLOUD?SIZES[y][1]:(localOwned(y)??SIZES[y][1]);
+    ALL[y]=Math.min(n,SIZES[y][0])}
+  allAt=Date.now(); allBusy=false;
+  if(view==="stats")renderPanel(); if($("shelf").open)drawShelf();
+}
+function allCounts(){const o=Object.assign({},ALL||{}); if(SET&&SIZES[SET.year])o[SET.year]=owned.size; return o}
+function overallHTML(){
+  if(!ALL){refreshAll();return `<section class="dcard overall"><h3>Entire collection</h3><p class="d-note">Adding up every binder…</p></section>`}
+  refreshAll();
+  const c=allCounts(), ys=YEARS.filter(y=>SIZES[y]&&c[y]>0);
+  if(!ys.length)return "";
+  const have=ys.reduce((a,y)=>a+c[y],0), tot=ys.reduce((a,y)=>a+SIZES[y][0],0), pct=tot?100*have/tot:0, done=ys.filter(y=>c[y]>=SIZES[y][0]).length;
+  return `<section class="dcard overall"><h3>Entire collection</h3>
+    <div class="ringbox"><div class="ring" style="--p:${pct.toFixed(1)}"><b>${pct<10&&pct>0?pct.toFixed(1):Math.floor(pct)}%</b></div>
+      <div class="stats"><div class="stat"><b>${have.toLocaleString()}</b><span>cards owned</span></div><div class="stat"><b>${(tot-have).toLocaleString()}</b><span>to go</span></div><div class="stat"><b>${ys.length}</b><span>set${ys.length===1?"":"s"} started</span></div><div class="stat"><b>${done}</b><span>complete</span></div></div></div>
+    <div class="bars yrs">${ys.map(y=>`<button type="button" class="row" data-oy="${y}"${SET&&SET.year===y?' aria-current="true"':""}><span>${y}</span><div class="tb"><i style="width:${100*c[y]/SIZES[y][0]}%"></i></div><span>${c[y]}/${SIZES[y][0]}</span></button>`).join("")}</div>
+    <p class="d-note">Counts only years with at least one card. Totals use each started set's full checklist.</p></section>`;
+}
 function statsHTML(){
   const tot=cards.length, have=owned.size, need=tot-have, pct=tot?100*have/tot:0;
   let dupes=0, dupeCards=0; for(const n of owned){const x=extra(n);if(x){dupes+=x;dupeCards++}}
@@ -1044,6 +1082,7 @@ function statsHTML(){
   const bar=(label,a)=>{const hv=h(a);return a.length?`<div class="row"><span>${label}</span><div class="tb"><i style="width:${100*hv/a.length}%"></i></div><span>${hv}/${a.length}</span></div>`:""};
   return `<div class="pv-head"><div><h2>${SET.year} dashboard</h2><p>${SET.year} Topps Heritage · ${tot} cards in the ${SET.year-49} style</p></div></div>
   <div class="dash">
+    ${overallHTML()}
     <section class="dcard"><h3>Completion</h3><div class="ringbox"><div class="ring" style="--p:${pct.toFixed(1)}"><b>${pct<10&&pct>0?pct.toFixed(1):Math.floor(pct)}%</b></div>
       <div class="stats"><div class="stat"><b>${have}</b><span>owned</span></div><div class="stat"><b>${need}</b><span>missing</span></div><div class="stat"><b>${dupes}</b><span title="${dupeCards} card${dupeCards===1?"":"s"} with more than one copy">extra cop${dupes===1?"y":"ies"}</span></div><div class="stat"><b>${fullSheets}/${SHEETS}</b><span>sheets full</span></div></div></div></section>
     <section class="dcard"><h3>Milestones</h3><div class="miles">${M.map(x=>`<div class="mile${have>=x.at?" on":""}"><b>${x.m}%</b><span>${have>=x.at?"Reached":x.at+" cards"}</span></div>`).join("")}</div>
@@ -1156,6 +1195,7 @@ $("panel").addEventListener("click",e=>{
   if((el=e.target.closest("[data-gf]"))){gF=el.dataset.gf;render()}
   else if((el=e.target.closest("[data-vf]"))){vF=el.dataset.vf;render()}
   else if((el=e.target.closest("[data-wa]")))wantAction(el.dataset.wa);
+  else if((el=e.target.closest("[data-oy]"))){const y=+el.dataset.oy;if(!SET||SET.year!==y)openSet(y).then(ok=>{if(ok)setView("stats")})}
   else if((el=e.target.closest("[data-go]"))){if(el.dataset.go==="teams")goBinder(TEAM_PAGE);else{gF="need";gQ="";setView("grid")}}
   else if(e.target.closest("[data-vadd]"))openVaultAdd();
   else if((el=e.target.closest("[data-vx]")))openVaultItem(el.dataset.vx);
@@ -1338,12 +1378,13 @@ async function openSet(year){
 function drawShelf(){
   $("shelfGrid").innerHTML=YEARS.map(y=>{
     const ready=!!READY[y], open=SET&&SET.year===y;
-    const line=open?`Open now · ${owned.size} of ${cards.length}`:ready?"Ready to open":"Not set up yet";
+    const n=ALL&&ALL[y]!=null?ALL[y]:null;
+    const line=open?`Open now · ${owned.size} of ${cards.length}`:ready?(n?`${n} of ${SIZES[y][0]}`:"Ready to open"):"Not set up yet";
     return `<button type="button" class="spine${ready?" ready":""}${open?" open":""}" data-year="${y}"><b>${y}</b><span>${y-49} design</span><span>${line}</span></button>`;
   }).join("");
   $("shelfMsg").textContent="";
 }
-$("binderBtn").onclick=()=>{drawShelf();$("shelf").showModal()};
+$("binderBtn").onclick=()=>{drawShelf();$("shelf").showModal();refreshAll()};
 $("shelfClose").onclick=()=>$("shelf").close();
 $("shelf").addEventListener("click",async e=>{
   if(e.target===$("shelf")){$("shelf").close();return}
