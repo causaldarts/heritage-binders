@@ -7,7 +7,7 @@ export default async () => {
   const store = getStore({ name: "binders", consistency: "strong" });
   const counts = {};
   await Promise.all(Array.from({ length: 26 }, (_, i) => 2026 - i).map(async (y) => {
-    const d = await store.get("binder/collection-" + y, { type: "json" });
+    const d = await store.get(y === 2026 ? "binder/collection" : "binder/collection-" + y, { type: "json" });
     if (d) counts[y] = Object.values(d.owned || {}).filter((v) => v === true).length;
   }));
   return json({ counts });
