@@ -369,6 +369,43 @@ body.panel-on .stage,body.panel-on .nav{display:none}
 .bars .row span:last-child{text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
 .bars .tb{height:8px;border-radius:4px;background:rgba(255,255,255,.09);overflow:hidden}
 .dcard.overall{grid-column:1/-1}
+body.at-home>:not(#home):not(dialog):not(script){display:none!important}
+.home{flex:1;overflow:auto;-webkit-overflow-scrolling:touch}
+.home-in{max-width:1180px;margin:0 auto;padding:34px 22px 50px}
+.home-hero{text-align:center;margin-bottom:26px}
+.home-kick{margin:0;font:600 .85rem var(--cond);letter-spacing:.14em;text-transform:uppercase;color:var(--red)}
+.home h1{margin:6px 0 6px;font:400 clamp(2rem,5vw,3.3rem)/1.05 var(--vintage);color:var(--navy);letter-spacing:.01em}
+.home-sub{margin:0 auto;max-width:560px;color:var(--muted)}
+.home-cta{margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.home-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:12px;margin-bottom:16px}
+.hstat{background:var(--grain),var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 2px 0 var(--line);padding:14px 16px}
+.hstat b{display:block;font:700 1.75rem/1.1 var(--display);color:var(--navy);font-variant-numeric:tabular-nums}
+.hstat span{display:block;margin-top:3px;font-size:.86rem;color:var(--muted)}
+.hstat.lead b{color:var(--red)}
+.home-cols{display:grid;align-items:start;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;margin-bottom:26px}
+.hlist{list-style:none;margin:0;padding:0}
+.hlist li{display:grid;grid-template-columns:48px 1fr auto;gap:10px;align-items:center;padding:7px 0;border-top:1px dashed var(--line)}
+.hlist li:first-child{border-top:0}
+.hlist b{font-family:var(--display);font-size:1.05rem}
+.hlist .tb{height:8px;border-radius:4px;background:rgba(31,42,68,.1);overflow:hidden}.hlist .tb i{display:block;height:100%;background:var(--navy);border-radius:4px}
+.hlist .r{text-align:right;color:var(--muted);font-size:.9rem;font-variant-numeric:tabular-nums}
+.hlist button{all:unset;cursor:pointer;display:contents}
+.home-h2{font:700 1.4rem var(--display);color:var(--navy);margin:0 0 12px}
+.home-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:12px}
+.htile{position:relative;text-align:left;font:inherit;color:var(--ink);background:var(--grain),var(--surface);border:1px solid var(--line);border-left:6px solid var(--navy);border-radius:10px;padding:12px 14px 13px;cursor:pointer;box-shadow:0 2px 0 var(--line);transition:transform .15s,box-shadow .15s}
+.htile:hover,.htile:focus-visible{transform:translateY(-2px);box-shadow:0 4px 0 var(--line),0 10px 22px rgba(80,60,20,.12)}
+.htile.started{border-left-color:var(--red)}.htile.done{border-left-color:var(--green)}
+.htile.off{opacity:.55;cursor:default;border-left-color:var(--line-2)}.htile.off:hover{transform:none;box-shadow:0 2px 0 var(--line)}
+.htile .y{font:700 1.6rem/1 var(--display);color:var(--navy)}
+.htile .d{display:block;font-size:.8rem;color:var(--muted);margin-top:3px}
+.htile .chip{position:absolute;top:12px;right:12px;font:600 .68rem var(--cond);letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:4px;background:rgba(31,42,68,.09);color:var(--navy)}
+.htile.started .chip{background:var(--red);color:#fff8ec}.htile.done .chip{background:var(--green);color:#fff8ec}
+.htile .tb{height:7px;border-radius:4px;background:rgba(31,42,68,.1);overflow:hidden;margin:10px 0 5px}.htile .tb i{display:block;height:100%;background:var(--red);border-radius:4px}
+.htile .ln{display:flex;justify-content:space-between;gap:8px;font-size:.86rem;font-variant-numeric:tabular-nums}
+.htile .v{margin-top:6px;font-size:.86rem;color:var(--muted)}.htile .v b{color:var(--ink);font-weight:600}
+.htile .v i{font-style:normal;font-size:.74rem;text-transform:uppercase;letter-spacing:.06em;margin-left:4px;color:var(--muted)}
+.home-foot{margin-top:22px;text-align:center}
+.home-tab{margin-right:6px}
 .ov-val{margin-top:14px;max-width:560px}
 .dcard.sv .stat b{white-space:nowrap}
 .dcard.overall .ringbox{max-width:560px}
@@ -546,6 +583,23 @@ dialog h2,#shelf h2,#quick h2,.d-info h2{font-family:var(--vintage);font-weight:
 </style>
 </head>
 <body>
+<main class="home" id="home" hidden aria-labelledby="homeTitle">
+  <div class="home-in">
+    <header class="home-hero">
+      <p class="home-kick">Topps Heritage · 2001 to 2026</p>
+      <h1 id="homeTitle">Nolan's Heritage Collection</h1>
+      <p class="home-sub">Every Topps Heritage set, one binder per year. Pick a binder to open it.</p>
+      <div class="home-cta" id="homeCta"></div>
+    </header>
+    <section class="home-stats" id="homeStats" aria-label="Collection totals"></section>
+    <div class="home-cols">
+      <section class="dcard home-next" aria-labelledby="hnT"><h3 id="hnT">Closest to finished</h3><div id="homeNext"></div></section>
+      <section class="dcard home-val" aria-labelledby="hvT"><h3 id="hvT">Most valuable sets</h3><div id="homeVal"></div></section>
+    </div>
+    <section aria-labelledby="hbT"><h2 class="home-h2" id="hbT">The binders</h2><div class="home-grid" id="homeGrid"></div></section>
+    <p class="d-note home-foot">Set values are what a complete set sells for on eBay (checked November 2026). Your share is that value times the part of the set you own. Years marked "estimate" had few full-set sales.</p>
+  </div>
+</main>
 <header class="top">
   <button class="brand" id="binderBtn" type="button" aria-haspopup="dialog" title="Switch binder">
     <span class="brand-txt"><span class="brand-h" id="setTitle">Topps Heritage</span><span class="brand-p" id="setSub">Loading binder…</span></span>
@@ -563,6 +617,7 @@ dialog h2,#shelf h2,#quick h2,.d-info h2{font-family:var(--vintage);font-weight:
   </div>
 </header>
 <nav class="views" id="views" aria-label="Views">
+  <button type="button" class="vtab home-tab" id="homeTab">← Home</button>
   <button type="button" class="vtab" data-view="binder" aria-pressed="true">Binder</button>
   <button type="button" class="vtab" data-view="grid" aria-pressed="false">All cards</button>
   <button type="button" class="vtab" data-view="stats" aria-pressed="false">Dashboard</button>
@@ -1091,7 +1146,53 @@ async function refreshAll(){
     const n=SET&&SET.year===y?owned.size:remote[y]!=null?remote[y]:CLOUD?SIZES[y][1]:(localOwned(y)??SIZES[y][1]);
     ALL[y]=Math.min(n,SIZES[y][0])}
   allAt=Date.now(); allBusy=false;
-  if(view==="stats")renderPanel(); if($("shelf").open)drawShelf();
+  if(view==="stats")renderPanel(); if($("shelf").open)drawShelf(); if(atHome)drawHome();
+}
+let atHome=false;
+function showHome(){
+  atHome=true; document.body.classList.add("at-home"); $("home").hidden=false;
+  document.title="Nolan's Heritage Collection"; drawHome(); refreshAll();
+}
+function hideHome(){atHome=false; document.body.classList.remove("at-home"); $("home").hidden=true}
+function drawHome(){
+  const c=allCounts(), known=!!ALL;
+  const ys=YEARS.filter(y=>SIZES[y]&&c[y]>0), have=ys.reduce((a,y)=>a+c[y],0), tot=ys.reduce((a,y)=>a+SIZES[y][0],0);
+  const done=ys.filter(y=>c[y]>=SIZES[y][0]);
+  const share=ys.reduce((a,y)=>a+(SETVAL[y]?mid(SETVAL[y])*c[y]/SIZES[y][0]:0),0);
+  const startedFull=ys.reduce((a,y)=>a+(SETVAL[y]?mid(SETVAL[y]):0),0);
+  const runFull=YEARS.reduce((a,y)=>a+(SETVAL[y]?mid(SETVAL[y]):0),0);
+  const toGoVal=Math.max(0,startedFull-share);
+  const dash=v=>known?v:"…";
+  const st=[["lead",dash(have.toLocaleString()),"cards owned"],["",dash(tot?(100*have/tot).toFixed(1)+"%":"0%"),"of started sets"],["",dash((tot-have).toLocaleString()),"cards to go in started sets"],["",dash(String(ys.length)),`sets started of ${YEARS.length}`],["",dash(String(done.length)),"sets complete"],["lead",dash(usd(share)),"value of your cards, about"],["",dash(usd(toGoVal)),"to finish started sets, about"],["",usd(runFull),"all 26 sets, complete"]];
+  $("homeStats").innerHTML=st.map(([k,b,t])=>`<div class="hstat ${k}"><b>${b}</b><span>${t}</span></div>`).join("");
+  let last=0; try{last=+localStorage.getItem("heritage-last-binder")}catch(e){}
+  const go=READY[last]?last:(ys[0]||YEARS.find(y=>READY[y]));
+  $("homeCta").innerHTML=go?`<button type="button" class="btn gold" data-hy="${go}">Open the ${go} binder</button><button type="button" class="btn" id="homeAll">See all binders ↓</button>`:"";
+  const row=(y,r)=>`<li><button type="button" data-hy="${y}"><b>${y}</b><div class="tb"><i style="width:${100*c[y]/SIZES[y][0]}%"></i></div><span class="r">${r}</span></button></li>`;
+  const open=ys.filter(y=>c[y]<SIZES[y][0]).sort((a,b)=>c[b]/SIZES[b][0]-c[a]/SIZES[a][0]);
+  $("homeNext").innerHTML=!known?`<p class="d-note">Adding up every binder…</p>`:open.length?`<ul class="hlist">${open.slice(0,6).map(y=>row(y,`${SIZES[y][0]-c[y]} to go · ${Math.floor(100*c[y]/SIZES[y][0])}%`)).join("")}</ul>`:`<p class="d-note">No sets in progress yet.</p>`;
+  const byVal=YEARS.filter(y=>SETVAL[y]).sort((a,b)=>mid(SETVAL[b])-mid(SETVAL[a])).slice(0,6);
+  $("homeVal").innerHTML=`<ul class="hlist">${byVal.map(y=>`<li><button type="button" data-hy="${y}"><b>${y}</b><span>${esc(SETVAL[y].note)}</span><span class="r">${usd(SETVAL[y].lo)}–${usd(SETVAL[y].hi)}</span></button></li>`).join("")}</ul>`;
+  $("homeGrid").innerHTML=YEARS.map(y=>{
+    const ready=!!READY[y], n=c[y]||0, N=SIZES[y]?SIZES[y][0]:0, v=SETVAL[y];
+    const cls=!ready?"off":n>=N&&N?"done":n?"started":"";
+    const chip=!ready?"Not set up":n>=N&&N?"Complete":n?"In progress":"Not started";
+    return `<button type="button" class="htile ${cls}" data-hy="${y}"${ready?"":' aria-disabled="true"'}><span class="chip">${chip}</span><span class="y">${y}</span><span class="d">${y-49} design</span>
+      <div class="tb"><i style="width:${N?100*n/N:0}%"></i></div>
+      <div class="ln"><span>${N?`${known?n:"…"} of ${N}`:"—"}</span><span>${N&&known?Math.floor(100*n/N)+"%":""}</span></div>
+      ${v?`<div class="v"><b>${usd(v.lo)}–${usd(v.hi)}</b> complete${v.basis!=="sold"?`<i>${v.basis==="listed"?"asking":"estimate"}</i>`:""}${n&&known?` · yours ≈ ${usd(mid(v)*n/N)}`:""}</div>`:""}</button>`;
+  }).join("");
+}
+$("home").addEventListener("click",e=>{
+  if(e.target.closest("#homeAll")){$("hbT").scrollIntoView({behavior:"smooth"});return}
+  const b=e.target.closest("[data-hy]"); if(!b)return; const y=+b.dataset.hy;
+  if(!READY[y])return; location.hash="y"+y;
+});
+$("homeTab").onclick=()=>{location.hash="home"};
+function route(){
+  const m=/^#y(\d{4})$/.exec(location.hash);
+  if(m&&READY[+m[1]]){hideHome(); if(!SET||SET.year!==+m[1])openSet(+m[1]); else{document.title=`${SET.year} Heritage Binder`; render()} return}
+  showHome();
 }
 function allCounts(){const o=Object.assign({},ALL||{}); if(SET&&SIZES[SET.year])o[SET.year]=owned.size; return o}
 function overallHTML(){
@@ -1526,14 +1627,11 @@ $("backupFile").addEventListener("change",async e=>{
     drawShelf(); $("shelfMsg").textContent=`Loaded ${n} binder${n===1?"":"s"} from the backup.`;
   }catch(err){$("shelfMsg").textContent="That file is not a Heritage binders backup, or this browser would not store it."}
 });
-window.addEventListener("hashchange",()=>{const m=/^#y(\d{4})$/.exec(location.hash);if(m&&READY[+m[1]]&&(!SET||SET.year!==+m[1]))openSet(+m[1])});
+window.addEventListener("hashchange",route);
 (function start(){
-  const ready=YEARS.filter(y=>READY[y]); let y=ready[0];
   const m=/^#y(\d{4})$/.exec(location.hash);
-  if(m&&READY[+m[1]])y=+m[1];
-  else{try{const l=+localStorage.getItem("heritage-last-binder");if(READY[l])y=l}catch(e){}}
-  openSet(y);
-  if(view!=="binder")setView(view);
+  if(m&&READY[+m[1]]){openSet(+m[1]).then(()=>{if(view!=="binder")setView(view)});return}
+  showHome();
 })();
 
 </script>
