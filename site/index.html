@@ -369,6 +369,8 @@ body.panel-on .stage,body.panel-on .nav{display:none}
 .bars .row span:last-child{text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
 .bars .tb{height:8px;border-radius:4px;background:rgba(255,255,255,.09);overflow:hidden}
 .dcard.overall{grid-column:1/-1}
+.ov-val{margin-top:14px;max-width:560px}
+.dcard.sv .stat b{white-space:nowrap}
 .dcard.overall .ringbox{max-width:560px}
 .bars.yrs{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));column-gap:22px;margin-top:12px}
 .bars.yrs .row{grid-template-columns:44px 1fr 74px;width:100%;background:none;border:0;padding:3px 4px;color:inherit;font:inherit;text-align:left;cursor:pointer;border-radius:6px}
@@ -645,7 +647,39 @@ dialog h2,#shelf h2,#quick h2,.d-info h2{font-family:var(--vintage);font-weight:
 /* ===== binders: one per Topps Heritage set. Each set that is set up lives in its own file under sets/ ===== */
 const YEARS=Array.from({length:26},(_,i)=>2026-i);
 const READY={"2026": "sets/2026.js", "2025": "sets/2025.js", "2024": "sets/2024.js", "2001": "sets/2001.js", "2002": "sets/2002.js", "2003": "sets/2003.js", "2004": "sets/2004.js", "2005": "sets/2005.js", "2006": "sets/2006.js", "2007": "sets/2007.js", "2008": "sets/2008.js", "2009": "sets/2009.js", "2010": "sets/2010.js", "2011": "sets/2011.js", "2012": "sets/2012.js", "2013": "sets/2013.js", "2014": "sets/2014.js", "2015": "sets/2015.js", "2016": "sets/2016.js", "2017": "sets/2017.js", "2018": "sets/2018.js", "2019": "sets/2019.js", "2020": "sets/2020.js", "2021": "sets/2021.js", "2022": "sets/2022.js", "2023": "sets/2023.js"};
-const SIZES={"2026": [400, 352], "2025": [725, 143], "2024": [725, 0], "2001": [406, 0], "2002": [440, 0], "2003": [430, 0], "2004": [475, 0], "2005": [475, 0], "2006": [485, 0], "2007": [494, 0], "2008": [720, 0], "2009": [720, 0], "2010": [501, 0], "2011": [500, 0], "2012": [600, 0], "2013": [600, 0], "2014": [600, 0], "2015": [725, 0], "2016": [725, 0], "2017": [725, 0], "2018": [725, 0], "2019": [725, 0], "2020": [725, 0], "2021": [725, 0], "2022": [725, 0], "2023": [725, 0]};          // year -> [cards in the set, cards owned on the built-in checklist]           // year -> data file
+const SIZES={"2026": [400, 352], "2025": [725, 143], "2024": [725, 0], "2001": [406, 0], "2002": [440, 0], "2003": [430, 0], "2004": [475, 0], "2005": [475, 0], "2006": [485, 0], "2007": [494, 0], "2008": [720, 0], "2009": [720, 0], "2010": [501, 0], "2011": [500, 0], "2012": [600, 0], "2013": [600, 0], "2014": [600, 0], "2015": [725, 0], "2016": [725, 0], "2017": [725, 0], "2018": [725, 0], "2019": [725, 0], "2020": [725, 0], "2021": [725, 0], "2022": [725, 0], "2023": [725, 0]};
+/* What a complete set (everything this binder holds, short prints included) sells for, from eBay sales checked Nov 2026.
+   basis: "sold" = recent completed sales, "listed" = asking prices only, "estimate" = few or no comps found. */
+const SETVAL={
+ 2026:{lo:300,hi:400,basis:"sold",note:"#1-400 with all short prints"},
+ 2025:{lo:375,hi:525,basis:"sold",note:"#1-500 sells for about $325-425; High Number #501-725 about $50-100"},
+ 2024:{lo:310,hi:390,basis:"sold",note:"#1-500 sells for about $275-330; High Number #501-725 about $35-60"},
+ 2023:{lo:200,hi:275,basis:"sold",note:"#1-725 with short prints"},
+ 2022:{lo:250,hi:300,basis:"sold",note:"#1-725 with short prints"},
+ 2021:{lo:200,hi:275,basis:"estimate",note:"High Number set sells for about $30; few full-set sales found"},
+ 2020:{lo:175,hi:275,basis:"estimate",note:"High Number set sells for about $30; few full-set sales found"},
+ 2019:{lo:275,hi:375,basis:"estimate",note:"High Number set with short prints sold for $85"},
+ 2018:{lo:400,hi:600,basis:"listed",note:"Ohtani rookie year; High Number sets are listed at $250+"},
+ 2017:{lo:250,hi:400,basis:"estimate",note:"Judge rookie year; few full-set sales found"},
+ 2016:{lo:250,hi:400,basis:"estimate",note:"Few full-set sales found"},
+ 2015:{lo:250,hi:400,basis:"estimate",note:"Kris Bryant short print in High Number; few full-set sales found"},
+ 2014:{lo:400,hi:600,basis:"listed",note:"#1-500 listed at $320-400; High Number factory set with autograph adds more"},
+ 2013:{lo:425,hi:550,basis:"listed",note:"#1-500 listed at about $275-300; High Number was an online-only factory set"},
+ 2012:{lo:500,hi:700,basis:"sold",note:"#1-500 sold for $264; the High Numbers include the Bryce Harper rookie"},
+ 2011:{lo:200,hi:300,basis:"listed",note:"#1-500 with short prints"},
+ 2010:{lo:200,hi:350,basis:"estimate",note:"Few full-set sales found"},
+ 2009:{lo:800,hi:1100,basis:"sold",note:"#1-500 sold for $890; #426-720 sold for $925 (McCutchen rookie)"},
+ 2008:{lo:400,hi:700,basis:"estimate",note:"Kershaw rookie in High Number; few full-set sales found"},
+ 2007:{lo:250,hi:450,basis:"listed",note:"Listed at $480 with 33 variations"},
+ 2006:{lo:200,hi:350,basis:"estimate",note:"Few full-set sales found"},
+ 2005:{lo:250,hi:400,basis:"estimate",note:"Few full-set sales found"},
+ 2004:{lo:250,hi:400,basis:"estimate",note:"Few full-set sales found"},
+ 2003:{lo:250,hi:375,basis:"listed",note:"Set with most inserts listed at $360"},
+ 2002:{lo:150,hi:350,basis:"listed",note:"One sold for $125; dealers ask up to $395"},
+ 2001:{lo:250,hi:400,basis:"estimate",note:"Few full-set sales found"}
+};
+const BASIS={sold:"based on recent eBay sales",listed:"based on current asking prices",estimate:"rough estimate, few sales found"};
+const mid=v=>Math.round((v.lo+v.hi)/2), usd=v=>"$"+Math.round(v).toLocaleString();          // year -> [cards in the set, cards owned on the built-in checklist]           // year -> data file
 window.HERITAGE_SETS=window.HERITAGE_SETS||{};
 let SET=null, TEAMS=[], cards=[], byN=new Map(), idxOf=new Map(), BASELINE=[], SHOT=new Map(), LANDSET=new Set();
 let BACKUP=new Set(), SHEETS=0, PAGES=[], TEAM_PAGE=0, WANT_PAGE=0, GRID_PAGE=0, TOTAL_PAGES=0, SHOTB=new Map();
@@ -1070,7 +1104,8 @@ function overallHTML(){
     <div class="ringbox"><div class="ring" style="--p:${pct.toFixed(1)}"><b>${pct<10&&pct>0?pct.toFixed(1):Math.floor(pct)}%</b></div>
       <div class="stats"><div class="stat"><b>${have.toLocaleString()}</b><span>cards owned</span></div><div class="stat"><b>${(tot-have).toLocaleString()}</b><span>to go</span></div><div class="stat"><b>${ys.length}</b><span>set${ys.length===1?"":"s"} started</span></div><div class="stat"><b>${done}</b><span>complete</span></div></div></div>
     <div class="bars yrs">${ys.map(y=>`<button type="button" class="row" data-oy="${y}"${SET&&SET.year===y?' aria-current="true"':""}><span>${y}</span><div class="tb"><i style="width:${100*c[y]/SIZES[y][0]}%"></i></div><span>${c[y]}/${SIZES[y][0]}</span></button>`).join("")}</div>
-    <p class="d-note">Counts only years with at least one card. Totals use each started set's full checklist.</p></section>`;
+    ${(()=>{const vs=ys.filter(y=>SETVAL[y]);if(!vs.length)return"";const full=vs.reduce((a,y)=>a+mid(SETVAL[y]),0),share=vs.reduce((a,y)=>a+mid(SETVAL[y])*c[y]/SIZES[y][0],0);return `<div class="stats ov-val"><div class="stat"><b>${usd(full)}</b><span>complete sets, these years</span></div><div class="stat"><b>${usd(share)}</b><span>your share, about</span></div></div>`})()}
+    <p class="d-note">Counts only years with at least one card. Totals use each started set's full checklist. Values use the middle of each set's sold-price range.</p></section>`;
 }
 function statsHTML(){
   const tot=cards.length, have=owned.size, need=tot-have, pct=tot?100*have/tot:0;
@@ -1093,7 +1128,7 @@ function statsHTML(){
       <div class="acts"><button type="button" class="btn" data-go="teams">Team progress</button></div></section>
     <section class="dcard"><h3>Want list</h3><div class="stats"><div class="stat"><b>${need}</b><span>cards to find</span></div>${t?`<div class="stat"><b>${money(t.need)}</b><span>about, to finish</span></div>`:""}<div class="stat"><b>${need-cards.filter(c=>c.sp&&!owned.has(c.n)).length}</b><span>base missing</span></div><div class="stat"><b>${sp.length-h(sp)}</b><span>SPs missing</span></div></div>
       ${need?`<div class="acts"><button type="button" class="btn gold" data-go="missing">Show missing</button><button type="button" class="btn" data-wa="copy">Copy numbers</button><button type="button" class="btn" data-wa="csv">CSV</button><button type="button" class="btn" data-wa="print">Print</button></div>`:""}</section>
-    ${t?`<section class="dcard"><h3>Value at buy prices</h3><div class="stats"><div class="stat"><b>${money(t.have)}</b><span>in the binder</span></div><div class="stat"><b>${money(t.have+t.need)}</b><span>full set</span></div></div></section>`:""}
+    ${(v=>v?`<section class="dcard sv"><h3>Set value</h3><div class="stats"><div class="stat"><b>${money(v.lo)}–${money(v.hi)}</b><span>complete set</span></div><div class="stat"><b>${usd(mid(v)*have/tot)}</b><span>your ${Math.floor(pct)}% share, about</span></div></div><p class="d-note">${esc(v.note)} · ${BASIS[v.basis]}.</p></section>`:"")(SETVAL[SET.year])}
   </div>`;
 }
 
