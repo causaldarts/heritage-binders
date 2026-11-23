@@ -644,8 +644,8 @@ dialog h2,#shelf h2,#quick h2,.d-info h2{font-family:var(--vintage);font-weight:
 <script>
 /* ===== binders: one per Topps Heritage set. Each set that is set up lives in its own file under sets/ ===== */
 const YEARS=Array.from({length:26},(_,i)=>2026-i);
-const READY={"2026": "sets/2026.js", "2025": "sets/2025.js", "2024": "sets/2024.js", "2012": "sets/2012.js", "2013": "sets/2013.js", "2014": "sets/2014.js", "2015": "sets/2015.js", "2016": "sets/2016.js", "2017": "sets/2017.js", "2018": "sets/2018.js", "2019": "sets/2019.js", "2020": "sets/2020.js", "2021": "sets/2021.js", "2022": "sets/2022.js", "2023": "sets/2023.js"};
-const SIZES={"2026": [400, 352], "2025": [725, 143], "2024": [725, 0], "2012": [600, 0], "2013": [600, 0], "2014": [600, 0], "2015": [725, 0], "2016": [725, 0], "2017": [725, 0], "2018": [725, 0], "2019": [725, 0], "2020": [725, 0], "2021": [725, 0], "2022": [725, 0], "2023": [725, 0]};          // year -> [cards in the set, cards owned on the built-in checklist]           // year -> data file
+const READY={"2026": "sets/2026.js", "2025": "sets/2025.js", "2024": "sets/2024.js", "2008": "sets/2008.js", "2009": "sets/2009.js", "2010": "sets/2010.js", "2011": "sets/2011.js", "2012": "sets/2012.js", "2013": "sets/2013.js", "2014": "sets/2014.js", "2015": "sets/2015.js", "2016": "sets/2016.js", "2017": "sets/2017.js", "2018": "sets/2018.js", "2019": "sets/2019.js", "2020": "sets/2020.js", "2021": "sets/2021.js", "2022": "sets/2022.js", "2023": "sets/2023.js"};
+const SIZES={"2026": [400, 352], "2025": [725, 143], "2024": [725, 0], "2008": [720, 0], "2009": [720, 0], "2010": [501, 0], "2011": [500, 0], "2012": [600, 0], "2013": [600, 0], "2014": [600, 0], "2015": [725, 0], "2016": [725, 0], "2017": [725, 0], "2018": [725, 0], "2019": [725, 0], "2020": [725, 0], "2021": [725, 0], "2022": [725, 0], "2023": [725, 0]};          // year -> [cards in the set, cards owned on the built-in checklist]           // year -> data file
 window.HERITAGE_SETS=window.HERITAGE_SETS||{};
 let SET=null, TEAMS=[], cards=[], byN=new Map(), idxOf=new Map(), BASELINE=[], SHOT=new Map(), LANDSET=new Set();
 let BACKUP=new Set(), SHEETS=0, PAGES=[], TEAM_PAGE=0, WANT_PAGE=0, GRID_PAGE=0, TOTAL_PAGES=0, SHOTB=new Map();
@@ -664,7 +664,9 @@ function applySet(def){
   (def.backs||[]).forEach((n,k)=>SHOTB.set(n,`background-image:url(${dir}/bk${Math.floor(k/50)}.jpg);background-size:500% 1000%;background-position:${(k%5)/4*100}% ${Math.floor(k%50/5)/9*100}%`));
   const bu=def.backUp||[];   // the few backs printed upright, packed side by side
   bu.forEach((n,k)=>SHOTB.set(n,`background-image:url(${dir}/bkup.jpg);background-size:${bu.length*100}% 100%;background-position:${bu.length>1?k/(bu.length-1)*100:0}% 0%`));
-  BACKUP=new Set(bu);
+  const bs=def.backUpSheets||[];   // many upright backs: 10 x 5 per sheet, like the fronts
+  bs.forEach((n,k)=>SHOTB.set(n,`background-image:url(${dir}/bu${Math.floor(k/50)}.jpg);background-size:1000% 500%;background-position:${(k%10)/9*100}% ${Math.floor(k%50/10)/4*100}%`));
+  BACKUP=new Set([...bu,...bs]);
   /* a spread is two pages: the back of one sheet on the left and the front of the next on the right, as in a real binder */
   SHEETS=Math.ceil(cards.length/9);
   PAGES=[{t:"cover"}];
